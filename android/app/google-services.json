@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "978447489137",
+    "firebase_url": "https://udhaar-b725c.firebaseio.com",
+    "project_id": "udhaar-b725c",
+    "storage_bucket": "udhaar-b725c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:978447489137:android:f0f27575adca4efbd8e3d0",
+        "android_client_info": {
+          "package_name": "com.suivantec.udhaarmlm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "978447489137-kmv9mtpmbqt4amvnjkga9hq15pg8fs5t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.suivantec.udhaarmlm",
+            "certificate_hash": "4efbdbf8ca54329ab1c9718179e2a5c9c092871d"
+          }
+        },
+        {
+          "client_id": "978447489137-78qds9lo5527badv2ju20uu4p5s43f2f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1XP49r3zkq6qsR1JOaOCKVtHyffBHdSs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "978447489137-78qds9lo5527badv2ju20uu4p5s43f2f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
