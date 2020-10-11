@@ -1,4 +1,5 @@
 import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,8 @@ import 'package:udhaar/components/h2.dart';
 import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/components/or_divider.dart';
 import 'package:udhaar/components/text_Field_outlined.dart';
+import 'package:udhaar/models/User_Model.dart';
+import 'package:udhaar/providers/firebase_functions.dart';
 import 'package:udhaar/providers/general_provider.dart';
 import 'package:udhaar/results_screen/GoogleDone.dart';
 import 'package:udhaar/screens/authentication_handler/components/background.dart';
@@ -39,43 +42,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool active = false;
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // ignore: deprecated_member_use
-  Future<FirebaseUser> _handleSignIn() async {
-    // hold the instance of the authenticated user
-//    FirebaseUser user;
-    // flag to check whether we're signed in already
-    bool isSignedIn = await _googleSignIn.isSignedIn();
-    if (isSignedIn) {
-      // if so, return the current user
-      _user = _auth.currentUser;
-    } else {
-      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      // get the credentials to (access / id token)
-      // to sign in via Firebase Authentication
-      // ignore: deprecated_member_use
-      final AuthCredential credential = GoogleAuthProvider.getCredential(
-          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
-      _user = (await _auth.signInWithCredential(credential)).user;
-    }
-
-    return _user;
-  }
-
-  void onGoogleSignIn(BuildContext context) async {
-    // ignore: deprecated_member_use
-    FirebaseUser user = await _handleSignIn();
-
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => GoogleDone(user, _googleSignIn)));
-  }
+  bool authCheckFields = false;
 
   @override
   Widget build(BuildContext context) {
@@ -93,14 +60,12 @@ class _LoginPageState extends State<LoginPage> {
             )
           ]),
     );
-
     Widget subTitle = Padding(
         padding: const EdgeInsets.only(right: 56.0, top: 20),
         child: H1(
           textBody: 'Login to your account using\nEmail',
           color: kTextLightColor,
         ));
-
     TextFieldOutlined emailTextField = TextFieldOutlined(
       textFieldText: 'Email (example@gmail.com)',
       textFieldIcon: Icon(
@@ -131,7 +96,6 @@ class _LoginPageState extends State<LoginPage> {
         return '';
       },
     );
-
     void _showDialog() {
       showDialog(
         context: context,
@@ -149,32 +113,64 @@ class _LoginPageState extends State<LoginPage> {
           print('Attempting signing  in:');
           print(emailTextField.getReturnValue());
           print(passwordTextField.getReturnValue());
+          String emailRetValue =
+              emailTextField.getReturnValue().toString().trim();
+          String passRetValue =
+              passwordTextField.getReturnValue().toString().trim();
           try {
-            UserCredential userCredential = await FirebaseAuth.instance
-                .signInWithEmailAndPassword(
-                    email: emailTextField.getReturnValue(),
-                    password: passwordTextField.getReturnValue());
-            FirebaseAuth.instance.authStateChanges().listen((User user) {
-              if (user == null) {
-                print('User unauthenticated');
-              } else {
-                print("Login successful");
-              }
-              if (_auth.currentUser != null) {
-                print(_auth.currentUser.uid);
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) {
-                    return DashBoard();
-                  },
-                ));
-              }
-            });
-          } on FirebaseAuthException catch (e) {
-            if (e.code == 'user-not-found') {
-              print('No user found for that email.');
-            } else if (e.code == 'wrong-password') {
-              print('Wrong password provided for that user.');
+            if (emailRetValue.toString().contains('@') != false &&
+                emailRetValue.toString().endsWith('.com') != false &&
+                passRetValue.toString().length <= 6) {
+              setState(() {
+                //cannot allow signup
+                authCheckFields = false;
+              });
+            } else {
+              setState(() {
+                //allow signup
+                authCheckFields = true;
+              });
             }
+            if (authCheckFields == true) {
+              final signInUser = (await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(
+                          email: emailTextField.getReturnValue().trim(),
+                          password: passwordTextField.getReturnValue().trim()))
+                  .user;
+              if (signInUser != null) {
+                final currentUserId = signInUser.uid;
+                print(currentUserId);
+                getUserDocFirebase(currentUserId).then((userObjDoc) {
+                  try {
+                    print("dsdsad" + userObjDoc.userID);
+                    Provider.of<General_Provider>(context, listen: false)
+                        .set_user(userObjDoc);
+                    try {
+                      Provider.of<General_Provider>(context, listen: false)
+                          .set_firebase_user(signInUser);
+                      print("User Signed In, Proceeding to Dashboard");
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) {
+                          return DashBoard();
+                        },
+                      ));
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'user-not-found') {
+                        print('No user found for that email.');
+                      } else if (e.code == 'wrong-password') {
+                        print('Wrong password provided for that user.');
+                      }
+                    }
+
+                    print('set_firebase_user');
+                  } catch (e) {
+                    print(e);
+                  }
+                });
+              }
+            }
+          } catch (e) {
+            print(e);
           }
           stopLoading();
         } else {
@@ -183,7 +179,6 @@ class _LoginPageState extends State<LoginPage> {
       },
       labelText: "SIGN IN",
     );
-
     // ignore: non_constant_identifier_names
     Widget SigninForm = Container(
       child: Column(
@@ -264,7 +259,32 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                         onPressed: () {
-                          onGoogleSignIn(context);
+                          Alert(
+                              context: context,
+                              title: "Coming Soon",
+                              style: AlertStyle(
+                                titleStyle:
+                                    H2TextStyle(color: kPrimaryAccentColor),
+                              ),
+                              content: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  H3(
+                                      textBody:
+                                          "Stay tuned for the next update :)"),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
+                              ),
+                              buttons: [
+                                DialogButton(
+                                  color: Colors.white,
+                                  height: 0,
+                                ),
+                              ]).show();
                         },
                       ),
                     ),

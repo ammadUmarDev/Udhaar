@@ -14,41 +14,21 @@ class FaqScreen extends StatefulWidget {
 class _FaqScreenState extends State<FaqScreen> {
   List<Panel> panels = [
     Panel(
-        'Q: How many accounts can I own?',
-        'A: Corresponding to one phone number, or one CNIC number, you can create only one account.',
+        'Q: What is Udhaar all about?',
+        'A: Udhaar is a money lending manager app that will keep track of the people (friends, etc.) who owe you money and those whom you owe money. If any user is hesitant to ask back for their lended money, Udhaar will send a reminder when close to the due date. Furthermore, Udhaar lets you add people as friends, request/approve a loan, keep track of the pending/cleared debts, and due dates.',
         false),
-    Panel('Q: How long does delivery take?',
-        'A: Delivery usually takes 5-7 business days.', false),
-    Panel('Q: Can I change my order?',
-        'A: You can track your order by going to Profile->My Orders.', false),
+    Panel(
+        'Q: How many accounts can I own?',
+        'A: Corresponding to one email, you can create only one account.',
+        false),
     Panel(
         'Q: Can I edit my profile?',
         'A: Yes, you can edit your profile by going to Profile->General Settings->User Settings.',
         false),
     Panel(
-        'Q: If I have an account already as a Customer but want to start selling can I change my account?',
-        'A: Yes, you can change your account type in settings. You may have to provide additional information.',
-        false),
-    Panel(
-        'Q: Can I edit my existing products?',
-        'A: Yes, you can edit your existing products under ‘My Products’.',
-        false),
-    Panel(
         'Q: Can I change my password?',
         'A: Yes, you can do this by going into Profile->Security Settings.',
         false),
-    Panel(
-        'Q: How can I pay for my order?',
-        'A: Currently, you can only pay by cash on delivery or cash on pickup. We will be adding more options in future.',
-        false),
-    Panel(
-        'Q: Do I always have to confirm a customer’s order?',
-        'A: No, you can choose to not confirm a customer’s order, or cancel it.',
-        false),
-    Panel(
-        'Q: Can customers contact me?',
-        'A: Yes, the customers can contact you on your given contact details (phone number, email address). ',
-        false)
   ];
 
   @override

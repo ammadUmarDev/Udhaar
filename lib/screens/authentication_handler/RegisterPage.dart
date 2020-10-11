@@ -5,10 +5,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:udhaar/components/already_have_an_account_acheck.dart';
 import 'package:udhaar/components/buttonErims.dart';
 import 'package:udhaar/components/h1.dart';
 import 'package:udhaar/components/h2.dart';
+import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/components/or_divider.dart';
 import 'package:udhaar/components/text_Field_outlined.dart';
 import 'package:udhaar/models/User_Model.dart';
@@ -36,49 +38,6 @@ class _RegisterPageState extends State<RegisterPage> {
   String password;
   bool authCheckFields = false;
   bool _showSpinner = false;
-
-  bool _wrongEmail = false;
-  bool _wrongPassword = false;
-
-  String _emailText = 'Please use a valid email';
-  String _passwordText = 'Please use a valid password';
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // ignore: deprecated_member_use
-  Future<FirebaseUser> _handleSignIn() async {
-    // hold the instance of the authenticated user
-    // ignore: deprecated_member_use
-    FirebaseUser user;
-    // flag to check whether we're signed in already
-    bool isSignedIn = await _googleSignIn.isSignedIn();
-    if (isSignedIn) {
-      // if so, return the current user
-      user = _auth.currentUser;
-    } else {
-      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      // get the credentials to (access / id token)
-      // to sign in via Firebase Authentication
-      // ignore: deprecated_member_use
-      final AuthCredential credential = GoogleAuthProvider.getCredential(
-          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
-      user = (await _auth.signInWithCredential(credential)).user;
-    }
-    return user;
-  }
-
-  void onGoogleSignIn(BuildContext context) async {
-    // ignore: deprecated_member_use
-    FirebaseUser user = await _handleSignIn();
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => GoogleDone(user, _googleSignIn)));
-  }
 
   TextFieldOutlined fullNameTextField = TextFieldOutlined(
     textFieldText: 'Full Name (example: Donald Trump)',
@@ -171,16 +130,13 @@ class _RegisterPageState extends State<RegisterPage> {
               });
             }
             if (authCheckFields == true) {
-              print('createUser');
               final createUser = (await FirebaseAuth.instance
                       .createUserWithEmailAndPassword(
                           email: emailTextField.getReturnValue().trim(),
                           password: passwordTextField.getReturnValue().trim()))
                   .user;
-              print('done creation');
               if (createUser != null) {
                 final currentUserId = createUser.uid;
-                print('createdUserModelObj');
                 final createdUserModelObj = UserModel(
                   userID: currentUserId,
                   fullName: fullNameTextField.getReturnValue(),
@@ -193,19 +149,14 @@ class _RegisterPageState extends State<RegisterPage> {
                       .format(DateTime.now())
                       .toString(),
                 );
-                print("done model creation");
                 signupFirebaseDb(createdUserModelObj).then((retUser) async {
-                  print('set_user');
                   try {
                     Provider.of<General_Provider>(context, listen: false)
                         .set_user(createdUserModelObj);
-                    print('userCredential');
                     try {
-                      print("signIn");
-                      print("set_firebase_user");
                       Provider.of<General_Provider>(context, listen: false)
                           .set_firebase_user(createUser);
-                      print("navigator");
+                      print("User Created, Proceeding to Dashboard");
                       Navigator.push(context, MaterialPageRoute(
                         builder: (context) {
                           return DashBoard();
@@ -237,79 +188,7 @@ class _RegisterPageState extends State<RegisterPage> {
       },
       labelText: "SIGN UP",
     );
-//    Widget registerButton = ButtonLoadingCircularLeft(
-//        labelText: "Sign Up",
-//        onTap: () async {
-//          setState(() {
-//            _wrongEmail = false;
-//            _wrongPassword = false;
-//          });
-//          try {
-//            if (validator.isEmail(email) & validator.isLength(password, 6)) {
-//              setState(() {
-//                _showSpinner = true;
-//              });
-//              bool internetCheck_ = await internetCheck();
-//              if (internetCheck_ == true) {
-//                final newUser = await _auth.createUserWithEmailAndPassword(
-//                  email: email,
-//                  password: password,
-//                );
-//                if (newUser != null) {
-//                  print('User Authenticated by registration');
-//                  final UserModel userObj =
-//                      UserModel(fullName: name, email: email, pass: password);
-//                  print('userObj');
-//                  var check = await signupFirebaseDb(userObj);
-//                  print('signup');
-//                  Provider.of<General_Provider>(context, listen: false)
-//                      .set_user(userObj);
-//                  print('set_user');
-//                  UserCredential userCredential = await FirebaseAuth.instance
-//                      .signInWithEmailAndPassword(
-//                          email: email, password: password);
-//                  print('userCredential');
-//                  Provider.of<General_Provider>(context, listen: false)
-//                      .set_firebase_user(userCredential.user);
-//                  print('set_firebase_user');
-//                  if (check == true) {
-//                    Navigator.push(context, MaterialPageRoute(
-//                      builder: (context) {
-//                        return DashBoard();
-//                      },
-//                    ));
-//                  }
-//                }
-//              }
-//            }
-//
-//            setState(() {
-//              if (!validator.isEmail(email)) {
-//                _wrongEmail = true;
-//              } else if (!validator.isLength(password, 6)) {
-//                _wrongPassword = true;
-//              } else {
-//                _wrongEmail = true;
-//                _wrongPassword = true;
-//              }
-//              setState(() {
-//                _showSpinner = false;
-//              });
-//            });
-//          } catch (e) {
-//            setState(() {
-//              _wrongEmail = true;
-//              if (e.code == 'ERROR_EMAIL_ALREADY_IN_USE') {
-//                _emailText =
-//                    'The email address is already in use by another account';
-//              }
-//            });
-//            setState(() {
-//              _showSpinner = false;
-//            });
-//          }
-//        });
-    // ignore: non_constant_identifier_names
+
     Widget SiginForm = Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -392,7 +271,32 @@ class _RegisterPageState extends State<RegisterPage> {
                             ],
                           ),
                           onPressed: () {
-                            onGoogleSignIn(context);
+                            Alert(
+                                context: context,
+                                title: "Coming Soon",
+                                style: AlertStyle(
+                                  titleStyle:
+                                      H2TextStyle(color: kPrimaryAccentColor),
+                                ),
+                                content: Column(
+                                  children: <Widget>[
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    H3(
+                                        textBody:
+                                            "Stay tuned for the next update :)"),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                  ],
+                                ),
+                                buttons: [
+                                  DialogButton(
+                                    color: Colors.white,
+                                    height: 0,
+                                  ),
+                                ]).show();
                           },
                         ),
                       ),

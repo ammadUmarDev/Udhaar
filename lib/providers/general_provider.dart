@@ -8,7 +8,7 @@ class General_Provider extends ChangeNotifier {
   // ignore: non_constant_identifier_names
   FirebaseAuth auth = FirebaseAuth.instance;
   UserModel user;
-  FirebaseUser firebaseUser;
+  User firebaseUser;
   UserModel get_user() {
     if (user == null) {
       print("User has not been set yet");
@@ -27,7 +27,7 @@ class General_Provider extends ChangeNotifier {
     return firebaseUser;
   }
 
-  void set_firebase_user(FirebaseUser u) {
+  void set_firebase_user(User u) {
     this.firebaseUser = u;
   }
 }

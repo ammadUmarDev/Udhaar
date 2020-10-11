@@ -79,20 +79,27 @@ Future<bool> change_User_Name(UserModel u, String new_name) async {
 //}
 
 /*retrieves firebase User document*/
-Future<UserModel> getUser(String userId) async {
-  Firestore firestore = Firestore.instance;
-  var snapshot = await firestore.collection('Users').document(userId).get();
-  if (snapshot.data != null) {
-    return UserModel(
-      email: snapshot.data()["Email"].toString(),
-      pass: snapshot.data()["Password"].toString(),
-      fullName: snapshot.data()["Full_Name"].toString(),
-      userID: snapshot.data()["User_ID"].toString(),
-      createdDate: snapshot.data()["Created_Date"].toString(),
-      lastPassChangeDate: snapshot.data()["Last_Pass_Change_Date"].toString(),
-    );
-  }
-  return null;
+Future<UserModel> getUserDocFirebase(String userId) async {
+  FirebaseFirestore db = FirebaseFirestore.instance;
+  CollectionReference users = db.collection('Users');
+  users
+      .where('User_Id', isEqualTo: userId)
+      .get()
+      .then((QuerySnapshot querySnapshot) {
+    querySnapshot.docs.forEach((documentSnapshot) {
+      print('Document exists on the database');
+      print(documentSnapshot["Email"].toString());
+      return UserModel(
+        email: documentSnapshot["Email"].toString(),
+        pass: documentSnapshot["Password"].toString(),
+        fullName: documentSnapshot["Full_Name"].toString(),
+        userID: documentSnapshot["User_Id"].toString(),
+        createdDate: documentSnapshot["Created_Date"].toString(),
+        lastPassChangeDate:
+            documentSnapshot["Last_Pass_Change_Date"].toString(),
+      );
+    });
+  });
 }
 
 Future<bool> signupFirebaseDb(UserModel user) async {
@@ -102,7 +109,7 @@ Future<bool> signupFirebaseDb(UserModel user) async {
   if (internetCheck_ == false)
     return false;
   else {
-    users.add({
+    await users.add({
       'User_Id': user.userID.toString(),
       'Full_Name': user.fullName.toString(),
       'Email': user.email.toString(),
