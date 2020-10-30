@@ -20,13 +20,9 @@ class ShadowBoxList extends StatelessWidget {
             borderRadius: BorderRadius.circular(5),
             boxShadow: [
               BoxShadow(
-                color: kPrimaryDarkColor,
+                color: kPrimaryAccentColor.withOpacity(0.5),
                 blurRadius: 20.0, // has the effect of softening the shadow
                 spreadRadius: 0.1, // has the effect of extending the shadow
-                offset: Offset(
-                  5.0, // horizontal, move right 10
-                  5.0, // vertical, move down 10
-                ),
               ),
             ],
           ),

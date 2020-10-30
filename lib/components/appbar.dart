@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
+import '../screens/dashboard/dashboard.dart';
 import 'h1.dart';
 
 class AppBarPageName extends StatelessWidget implements PreferredSizeWidget {
@@ -17,7 +18,7 @@ class AppBarPageName extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.transparent,
       title: H1(
         textBody: pageName,
-        color: kPrimaryDarkColor,
+        color: kTextDarkColor,
       ),
       elevation: 0,
       actions: [
@@ -25,36 +26,22 @@ class AppBarPageName extends StatelessWidget implements PreferredSizeWidget {
           child: Material(
             color: Colors.white, // button color
             child: InkWell(
-              splashColor: kPrimaryLightColor, // inkwell color
+              splashColor: kPrimaryAccentColor, // inkwell color
               child: SizedBox(
                 width: 56,
                 height: 56,
                 child: Icon(
                   Icons.home,
-                  color: kPrimaryDarkColor,
+                  color: kIconColor,
                 ),
               ),
-              onTap: () {},
-            ),
-          ),
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        ClipOval(
-          child: Material(
-            color: Colors.white, // button color
-            child: InkWell(
-              splashColor: kPrimaryLightColor, // inkwell color
-              child: SizedBox(
-                width: 56,
-                height: 56,
-                child: Icon(
-                  Icons.shopping_cart,
-                  color: kPrimaryDarkColor,
-                ),
-              ),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) {
+                    return DashBoard();
+                  },
+                ));
+              },
             ),
           ),
         ),

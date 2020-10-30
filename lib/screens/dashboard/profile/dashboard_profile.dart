@@ -9,6 +9,7 @@ import 'package:udhaar/components/h2.dart';
 import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/models/User_Model.dart';
 import 'package:udhaar/providers/general_provider.dart';
+import 'package:udhaar/screens/dashboard/profile/settings/general_settings_screen.dart';
 import '../../../constants.dart';
 import '../components/main_background.dart';
 import 'about_us.dart';
@@ -53,7 +54,10 @@ class _DashboardProfileState extends State<DashboardProfile> {
                   SizedBox(height: 10),
                   H3(textBody: "User ID:"),
                   SizedBox(height: 5),
-                  BodyText(textBody: user == null ? "Loading..." : user.userID),
+                  BodyText(
+                      textBody: user == null
+                          ? "Loading..."
+                          : user.userID.substring(0, 25)),
                   SizedBox(height: 10),
                   H3(textBody: "Email:"),
                   SizedBox(height: 5),
@@ -79,7 +83,7 @@ class _DashboardProfileState extends State<DashboardProfile> {
                 SizedBox(height: 10),
                 H3(textBody: "Account Status:"),
                 SizedBox(height: 5),
-                BodyText(textBody: "Loading..."),
+                BodyText(textBody: user == null ? "Loading..." : "Active"),
               ],
             ),
           ],
@@ -134,8 +138,8 @@ class _DashboardProfileState extends State<DashboardProfile> {
                   leading: Icon(FontAwesomeIcons.userCog),
                   trailing:
                       Icon(Icons.chevron_right, color: kPrimaryLightColor),
-//                  onTap: () => Navigator.of(context).push(
-//                      MaterialPageRoute(builder: (_) => SettingsScreen())),
+                  onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => SettingsScreen())),
                 ),
                 Divider(),
                 ListTile(

@@ -137,14 +137,21 @@ class _LoginPageState extends State<LoginPage> {
                           email: emailTextField.getReturnValue().trim(),
                           password: passwordTextField.getReturnValue().trim()))
                   .user;
+              print("we here ");
               if (signInUser != null) {
                 final currentUserId = signInUser.uid;
                 print(currentUserId);
-                getUserDocFirebase(currentUserId).then((userObjDoc) {
+                UserModel retGetUserDocFirebase;
+                await getUserDocFirebase(currentUserId)
+                    .then((value) => () async {
+                          print(value.fullName);
+                        });
+                print(retGetUserDocFirebase.userID);
+                if (retGetUserDocFirebase != null) {
                   try {
-                    print("dsdsad" + userObjDoc.userID);
+                    print("dsdsad" + retGetUserDocFirebase.userID);
                     Provider.of<General_Provider>(context, listen: false)
-                        .set_user(userObjDoc);
+                        .set_user(retGetUserDocFirebase);
                     try {
                       Provider.of<General_Provider>(context, listen: false)
                           .set_firebase_user(signInUser);
@@ -161,18 +168,16 @@ class _LoginPageState extends State<LoginPage> {
                         print('Wrong password provided for that user.');
                       }
                     }
-
-                    print('set_firebase_user');
+                    stopLoading();
                   } catch (e) {
                     print(e);
                   }
-                });
+                }
               }
             }
           } catch (e) {
             print(e);
           }
-          stopLoading();
         } else {
           stopLoading();
         }

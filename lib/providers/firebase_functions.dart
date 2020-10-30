@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 
 import 'package:udhaar/models/User_Model.dart';
@@ -24,42 +24,33 @@ Future<bool> internetCheck() async {
   return true;
 }
 
-//Change UserType
-Future<bool> update_User_Type(UserModel user) async {
-  var firestore = Firestore.instance;
-  await firestore.collection('Users').document(user.email).delete();
-  await firestore.collection('Users').document(user.email).setData({
-    'Full_Name': user.fullName.toString(),
-    'Email': user.email.toString(),
-    'Password': user.pass.toString(),
-  });
-  return true;
-}
-
 //Password Change
-Future<bool> changePassword(
-    UserModel u, String new_Pass, String entered_pass) async {
-  if (u.pass == entered_pass) {
-    // ignore: await_only_futures
-    print("Entered");
-    var fire = Firestore.instance;
-    await fire.collection("Users").document(u.email).updateData({
-      "Password": new_Pass.toString(),
-    });
+Future<bool> changePassword(UserModel u, String entered_pass) async {
+  FirebaseFirestore db = FirebaseFirestore.instance;
+  CollectionReference users = db.collection('Users');
+  User user = FirebaseAuth.instance.currentUser;
+  await user.updatePassword(entered_pass).then((_) async {
+    print("Succesfully changed auth password");
     return true;
-  } else {
+  }).catchError((error) {
+    print("Password can't be changed" + error.toString());
     return false;
-  }
+    //This might happen, when the wrong password is in, the user isn't found, or if the user hasn't logged in recently.
+  });
 }
 
 //User Name Change
-Future<bool> change_User_Name(UserModel u, String new_name) async {
-  var fire = Firestore.instance;
-  await fire
-      .collection("Users")
-      .document(u.fullName)
-      .updateData({"Full_Name": new_name});
-  return true;
+Future<bool> changeFullName(UserModel u, String new_name) async {
+  FirebaseFirestore db = FirebaseFirestore.instance;
+  CollectionReference users = db.collection('Users');
+  bool check = false;
+  await users
+      .doc(u.userID)
+      .update({'Full_Name': new_name})
+      .then((value) => check = true)
+      .catchError((error) => print("Failed to update user: $error"));
+
+  return check;
 }
 
 //Future<String> upload_file(File file /*, BuildContext context*/) async {
@@ -82,23 +73,20 @@ Future<bool> change_User_Name(UserModel u, String new_name) async {
 Future<UserModel> getUserDocFirebase(String userId) async {
   FirebaseFirestore db = FirebaseFirestore.instance;
   CollectionReference users = db.collection('Users');
-  users
-      .where('User_Id', isEqualTo: userId)
-      .get()
-      .then((QuerySnapshot querySnapshot) {
-    querySnapshot.docs.forEach((documentSnapshot) {
-      print('Document exists on the database');
-      print(documentSnapshot["Email"].toString());
+  await users.doc(userId).get().then((DocumentSnapshot documentSnapshot) {
+    if (documentSnapshot.exists) {
+      print('Document exist on the database');
       return UserModel(
-        email: documentSnapshot["Email"].toString(),
-        pass: documentSnapshot["Password"].toString(),
-        fullName: documentSnapshot["Full_Name"].toString(),
-        userID: documentSnapshot["User_Id"].toString(),
-        createdDate: documentSnapshot["Created_Date"].toString(),
+        email: documentSnapshot.data()["Email"].toString(),
+        fullName: documentSnapshot.data()["Full_Name"].toString(),
+        userID: documentSnapshot.data()["User_Id"].toString(),
+        createdDate: documentSnapshot.data()["Created_Date"].toString(),
         lastPassChangeDate:
-            documentSnapshot["Last_Pass_Change_Date"].toString(),
+            documentSnapshot.data()["Last_Pass_Change_Date"].toString(),
       );
-    });
+    } else {
+      print('Document does not exist on the database');
+    }
   });
 }
 
@@ -109,11 +97,10 @@ Future<bool> signupFirebaseDb(UserModel user) async {
   if (internetCheck_ == false)
     return false;
   else {
-    await users.add({
+    await users.doc(user.userID).set({
       'User_Id': user.userID.toString(),
       'Full_Name': user.fullName.toString(),
       'Email': user.email.toString(),
-      'Password': user.pass.toString(),
       'Created_Date': user.createdDate.toString(),
       'Last_Pass_Change_Date': user.lastPassChangeDate
           .toString(), //    new DateFormat("dd/MM/yyyy").parse("11/11/2011");

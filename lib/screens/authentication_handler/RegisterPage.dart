@@ -141,7 +141,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   userID: currentUserId,
                   fullName: fullNameTextField.getReturnValue(),
                   email: emailTextField.getReturnValue().trim(),
-                  pass: passwordTextField.getReturnValue().trim(),
                   createdDate: DateFormat("dd/MM/yyyy")
                       .format(DateTime.now())
                       .toString(),
@@ -162,6 +161,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           return DashBoard();
                         },
                       ));
+                      stopLoading();
                     } on FirebaseAuthException catch (e) {
                       if (e.code == 'user-not-found') {
                         print('No user found for that email.');
@@ -181,7 +181,6 @@ class _RegisterPageState extends State<RegisterPage> {
           } catch (e) {
             print(e);
           }
-          stopLoading();
         } else {
           stopLoading();
         }
