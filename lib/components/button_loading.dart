@@ -20,7 +20,7 @@ class _ButtonLoadingState extends State<ButtonLoading> {
     return ArgonButton(
       height: 45,
       roundLoadingShape: true,
-      width: MediaQuery.of(context).size.width * 0.45,
+      width: MediaQuery.of(context).size.width * 0.35,
       onTap: (startLoading, stopLoading, btnState) async {
         if (btnState == ButtonState.Idle) {
           startLoading();
@@ -28,8 +28,7 @@ class _ButtonLoadingState extends State<ButtonLoading> {
           stopLoading();
         }
       },
-      child: Text(widget.labelText,
-          style: H3TextStyle(color: kPrimaryAccentColor)),
+      child: Text(widget.labelText, style: H3TextStyle(color: kTextLightColor)),
       loader: Container(
         padding: EdgeInsets.all(10),
         child: SpinKitRotatingCircle(
@@ -37,7 +36,7 @@ class _ButtonLoadingState extends State<ButtonLoading> {
         ),
       ),
       borderRadius: 20.0,
-      color: Color(0xFFeeeeee),
+      color: kPrimaryAccentColor,
       borderSide: BorderSide(
         color: kPrimaryAccentColor,
         width: 5.0,

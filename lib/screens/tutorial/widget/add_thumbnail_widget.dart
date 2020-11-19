@@ -219,6 +219,7 @@ class _AddMediaDialogContentState extends State<AddMediaDialogContent> {
             Text(widget.titleText,
                 style: Theme.of(context)
                     .textTheme
+                    // ignore: deprecated_member_use
                     .title
                     .copyWith(color: Colors.black54)),
             SizedBox(height: 16),
@@ -227,6 +228,7 @@ class _AddMediaDialogContentState extends State<AddMediaDialogContent> {
             Text(widget.subTitleText,
                 style: Theme.of(context)
                     .textTheme
+                    // ignore: deprecated_member_use
                     .subtitle
                     .copyWith(fontSize: 12)),
             SizedBox(height: 16),

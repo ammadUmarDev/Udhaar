@@ -12,7 +12,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarPageName(pageName: "General Settings"),
-      body: Background_S(
+      body: BackgroundS(
         child: SafeArea(
           bottom: true,
           child: LayoutBuilder(
@@ -31,16 +31,14 @@ class SettingsScreen extends StatelessWidget {
                               leading: Icon(FontAwesomeIcons.userCog),
                               onTap: () => Navigator.of(context).push(
                                   MaterialPageRoute(
-                                      builder: (_) =>
-                                          Account_Settings_State())),
+                                      builder: (_) => AccountSettingsState())),
                             ),
                             ListTile(
                               title: Text('Security Settings'),
                               leading: Icon(FontAwesomeIcons.userLock),
                               onTap: () => Navigator.of(context).push(
                                   MaterialPageRoute(
-                                      builder: (_) =>
-                                          Security_Settings_State())),
+                                      builder: (_) => SecuritySettingsState())),
                             ),
                             ListTile(
                                 title: Text('Sign out'),

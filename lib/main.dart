@@ -8,7 +8,7 @@ import 'package:udhaar/screens/authentication_handler/RegisterPage.dart';
 import 'results_screen/Done.dart';
 
 void main() async {
-  await WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   Provider.debugCheckInvalidValueType = null;
   runApp(Home());

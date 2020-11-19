@@ -7,6 +7,7 @@ import 'package:udhaar/models/User_Model.dart';
 Future<bool> checkUniquenessOfEMAIL(String email) async {
   // ignore: deprecated_member_use
   Firestore firestore = Firestore.instance;
+  // ignore: deprecated_member_use
   var snapshot = await firestore.collection('Users').document(email).get();
   return snapshot.data == null;
 }
@@ -25,11 +26,9 @@ Future<bool> internetCheck() async {
 }
 
 //Password Change
-Future<bool> changePassword(UserModel u, String entered_pass) async {
-  FirebaseFirestore db = FirebaseFirestore.instance;
-  CollectionReference users = db.collection('Users');
+Future<bool> changePassword(UserModel u, String enteredPass) async {
   User user = FirebaseAuth.instance.currentUser;
-  await user.updatePassword(entered_pass).then((_) async {
+  await user.updatePassword(enteredPass).then((_) async {
     print("Succesfully changed auth password");
     return true;
   }).catchError((error) {
@@ -40,13 +39,13 @@ Future<bool> changePassword(UserModel u, String entered_pass) async {
 }
 
 //User Name Change
-Future<bool> changeFullName(UserModel u, String new_name) async {
+Future<bool> changeFullName(UserModel u, String newName) async {
   FirebaseFirestore db = FirebaseFirestore.instance;
   CollectionReference users = db.collection('Users');
   bool check = false;
   await users
       .doc(u.userID)
-      .update({'Full_Name': new_name})
+      .update({'Full_Name': newName})
       .then((value) => check = true)
       .catchError((error) => print("Failed to update user: $error"));
 
@@ -76,14 +75,16 @@ Future<UserModel> getUserDocFirebase(String userId) async {
   await users.doc(userId).get().then((DocumentSnapshot documentSnapshot) {
     if (documentSnapshot.exists) {
       print('Document exist on the database');
-      return UserModel(
+      UserModel returnUserModel = new UserModel(
         email: documentSnapshot.data()["Email"].toString(),
         fullName: documentSnapshot.data()["Full_Name"].toString(),
         userID: documentSnapshot.data()["User_Id"].toString(),
         createdDate: documentSnapshot.data()["Created_Date"].toString(),
         lastPassChangeDate:
             documentSnapshot.data()["Last_Pass_Change_Date"].toString(),
+        friendList: documentSnapshot.data()["Friend_List"].split(","),
       );
+      return returnUserModel;
     } else {
       print('Document does not exist on the database');
     }
@@ -91,10 +92,9 @@ Future<UserModel> getUserDocFirebase(String userId) async {
 }
 
 Future<bool> signupFirebaseDb(UserModel user) async {
-  FirebaseFirestore db = FirebaseFirestore.instance;
   CollectionReference users = FirebaseFirestore.instance.collection('Users');
-  bool internetCheck_ = await internetCheck();
-  if (internetCheck_ == false)
+  bool internetCheckVar = await internetCheck();
+  if (internetCheckVar == false)
     return false;
   else {
     await users.doc(user.userID).set({
@@ -102,8 +102,9 @@ Future<bool> signupFirebaseDb(UserModel user) async {
       'Full_Name': user.fullName.toString(),
       'Email': user.email.toString(),
       'Created_Date': user.createdDate.toString(),
-      'Last_Pass_Change_Date': user.lastPassChangeDate
-          .toString(), //    new DateFormat("dd/MM/yyyy").parse("11/11/2011");
+      'Last_Pass_Change_Date': user.lastPassChangeDate.toString(),
+      'Friend_List': user.friendList
+          .join(',') //    new DateFormat("dd/MM/yyyy").parse("11/11/2011");
     });
   }
   return true;

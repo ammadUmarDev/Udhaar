@@ -7,7 +7,6 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:udhaar/components/appbar.dart';
 import 'package:udhaar/components/body_text.dart';
 import 'package:udhaar/components/buttonErims.dart';
-import 'package:udhaar/components/button_loading.dart';
 import 'package:udhaar/components/h2.dart';
 import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/components/rounded_input_field.dart';
@@ -16,14 +15,14 @@ import 'package:udhaar/models/User_Model.dart';
 import 'package:udhaar/providers/firebase_functions.dart';
 import 'package:udhaar/providers/general_provider.dart';
 import 'package:udhaar/screens/dashboard/profile/Components/background_setting.dart';
-
 import '../../../../constants.dart';
 
-class Account_Settings_State extends StatefulWidget {
-  Account_Settings createState() => Account_Settings();
+class AccountSettingsState extends StatefulWidget {
+  AccountSettings createState() => AccountSettings();
 }
 
-class Account_Settings extends State<Account_Settings_State> {
+class AccountSettings extends State<AccountSettingsState> {
+  // ignore: non_constant_identifier_names
   String new_full_name;
   UserModel userObj;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -38,13 +37,12 @@ class Account_Settings extends State<Account_Settings_State> {
   @override
   Widget build(BuildContext context) {
     userObj = Provider.of<General_Provider>(context, listen: false).get_user();
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBarPageName(
         pageName: "Account Settings",
       ),
-      body: Background_S(
+      body: BackgroundS(
         child: SafeArea(
           child: Column(
             children: [
@@ -121,6 +119,8 @@ class Account_Settings extends State<Account_Settings_State> {
                         DialogButton(
                           color: Colors.white,
                           height: 0,
+                          child: SizedBox(height: 0),
+                          onPressed: () {},
                         ),
                       ]).show();
                 },

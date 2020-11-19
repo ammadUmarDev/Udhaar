@@ -4,33 +4,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:udhaar/components/already_have_an_account_acheck.dart';
 import 'package:udhaar/components/buttonErims.dart';
-import 'package:udhaar/components/button_loading.dart';
-import 'package:udhaar/components/button_loading_circularleft.dart';
 import 'package:udhaar/components/h1.dart';
 import 'package:udhaar/components/h2.dart';
 import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/components/or_divider.dart';
 import 'package:udhaar/components/text_Field_outlined.dart';
 import 'package:udhaar/models/User_Model.dart';
-import 'package:udhaar/providers/firebase_functions.dart';
 import 'package:udhaar/providers/general_provider.dart';
-import 'package:udhaar/results_screen/GoogleDone.dart';
 import 'package:udhaar/screens/authentication_handler/components/background.dart';
 import 'package:udhaar/screens/dashboard/dashboard.dart';
 import '../../constants.dart';
-import '../../results_screen/Done.dart';
 import 'RegisterPage.dart';
-
-bool _wrongEmail = false;
-bool _wrongPassword = false;
-
-// ignore: deprecated_member_use
-FirebaseUser _user;
 
 // ignore: must_be_immutable
 class LoginPage extends StatefulWidget {
@@ -96,15 +84,6 @@ class _LoginPageState extends State<LoginPage> {
         return '';
       },
     );
-    void _showDialog() {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          content:
-              Text("Invalid Username or Password"), //TODO: make dialog pretty
-        ),
-      );
-    }
 
     Widget loginButton = ButtonErims(
       onTap: (startLoading, stopLoading, btnState) async {
@@ -141,17 +120,35 @@ class _LoginPageState extends State<LoginPage> {
               if (signInUser != null) {
                 final currentUserId = signInUser.uid;
                 print(currentUserId);
-                UserModel retGetUserDocFirebase;
-                await getUserDocFirebase(currentUserId)
-                    .then((value) => () async {
-                          print(value.fullName);
-                        });
-                print(retGetUserDocFirebase.userID);
-                if (retGetUserDocFirebase != null) {
+                UserModel retGetUserObjFirebase;
+                //TODO: This function below returns null and provier is unable to save obj
+                FirebaseFirestore db = FirebaseFirestore.instance;
+                CollectionReference users = db.collection('Users');
+                await users
+                    .doc(currentUserId)
+                    .get()
+                    .then((DocumentSnapshot documentSnapshot) {
+                  if (documentSnapshot.exists) {
+                    print('Document exist on the database');
+                    retGetUserObjFirebase = UserModel(
+                      email: documentSnapshot.data()["Email"].toString(),
+                      fullName: documentSnapshot.data()["Full_Name"].toString(),
+                      userID: documentSnapshot.data()["User_Id"].toString(),
+                      createdDate:
+                          documentSnapshot.data()["Created_Date"].toString(),
+                      lastPassChangeDate: documentSnapshot
+                          .data()["Last_Pass_Change_Date"]
+                          .toString(),
+                      friendList:
+                          documentSnapshot.data()["Friend_List"].split(","),
+                    );
+                  }
+                });
+                if (retGetUserObjFirebase != null) {
                   try {
-                    print("dsdsad" + retGetUserDocFirebase.userID);
+                    print("dsdsad" + retGetUserObjFirebase.userID);
                     Provider.of<General_Provider>(context, listen: false)
-                        .set_user(retGetUserDocFirebase);
+                        .set_user(retGetUserObjFirebase);
                     try {
                       Provider.of<General_Provider>(context, listen: false)
                           .set_firebase_user(signInUser);
@@ -172,6 +169,8 @@ class _LoginPageState extends State<LoginPage> {
                   } catch (e) {
                     print(e);
                   }
+                } else {
+                  print("retGetUserDocFirebase is null");
                 }
               }
             }
@@ -220,100 +219,104 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.white,
       body: CustomPaint(
         painter: AuthBackground(),
-        child: Stack(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 28.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Spacer(flex: 3),
-                  welcomeBack,
-                  subTitle,
-                  Spacer(flex: 1),
-                  SigninForm,
-                  Spacer(flex: 2),
-                  Center(child: OrDivider()),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          bottomLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
-                          bottomRight: Radius.circular(20)),
-                    ),
-                    margin:
-                        EdgeInsets.only(left: 40.0, right: 40.0, bottom: 20),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: RaisedButton(
+        child: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 28.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Spacer(flex: 3),
+                    welcomeBack,
+                    subTitle,
+                    Spacer(flex: 1),
+                    SigninForm,
+                    Spacer(flex: 2),
+                    Center(child: OrDivider()),
+                    Container(
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        child: Row(
-                          children: <Widget>[
-                            Image.asset(
-                              'assets/google_logo.png',
-                              height: 25.0,
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(horizontal: 20.0),
-                              child: H2(
-                                textBody: 'Login with Google',
-                              ),
-                            ),
-                          ],
-                        ),
-                        onPressed: () {
-                          Alert(
-                              context: context,
-                              title: "Coming Soon",
-                              style: AlertStyle(
-                                titleStyle:
-                                    H2TextStyle(color: kPrimaryAccentColor),
-                              ),
-                              content: Column(
-                                children: <Widget>[
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  H3(
-                                      textBody:
-                                          "Stay tuned for the next update :)"),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                ],
-                              ),
-                              buttons: [
-                                DialogButton(
-                                  color: Colors.white,
-                                  height: 0,
-                                ),
-                              ]).show();
-                        },
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            bottomLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                            bottomRight: Radius.circular(20)),
                       ),
-                    ),
-                  ),
-
-                  AlreadyHaveAnAccountCheck(
-                    login: true,
-                    press: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return RegisterPage();
+                      margin:
+                          EdgeInsets.only(left: 40.0, right: 40.0, bottom: 20),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: RaisedButton(
+                          color: Colors.white,
+                          child: Row(
+                            children: <Widget>[
+                              Image.asset(
+                                'assets/google_logo.png',
+                                height: 25.0,
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(horizontal: 20.0),
+                                child: H2(
+                                  textBody: 'Login with Google',
+                                ),
+                              ),
+                            ],
+                          ),
+                          onPressed: () {
+                            Alert(
+                                context: context,
+                                title: "Coming Soon",
+                                style: AlertStyle(
+                                  titleStyle:
+                                      H2TextStyle(color: kPrimaryAccentColor),
+                                ),
+                                content: Column(
+                                  children: <Widget>[
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    H3(
+                                        textBody:
+                                            "Stay tuned for the next update :)"),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                  ],
+                                ),
+                                buttons: [
+                                  DialogButton(
+                                    color: Colors.white,
+                                    height: 0,
+                                    child: SizedBox(height: 0),
+                                    onPressed: () {},
+                                  ),
+                                ]).show();
                           },
                         ),
-                      );
-                    },
-                  ),
-                  Spacer(flex: 1),
+                      ),
+                    ),
+
+                    AlreadyHaveAnAccountCheck(
+                      login: true,
+                      press: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return RegisterPage();
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                    Spacer(flex: 1),
 //                  forgotPassword
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

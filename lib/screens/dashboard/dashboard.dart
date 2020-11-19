@@ -1,12 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/constants.dart';
 import 'package:udhaar/screens/dashboard/profile/dashboard_profile.dart';
 import 'package:udhaar/screens/dashboard/request/dashboard_request.dart';
-import 'file:///C:/Users/Ammad/AndroidStudioProjects/udhaar/lib/screens/dashboard/notification/dashboard_notification.dart';
-
+import 'notification/dashboard_notification.dart';
 import 'stats/dashboard_stats.dart';
 
 class DashBoard extends StatefulWidget {

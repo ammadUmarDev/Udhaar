@@ -6,12 +6,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'add_thumbnail.dart';
 import 'model/media_info.dart';
 
-class Tutorial_Screen extends StatefulWidget {
+class TutorialScreen extends StatefulWidget {
   @override
   _TutorialScreenState createState() => _TutorialScreenState();
 }
 
-class _TutorialScreenState extends State<Tutorial_Screen> {
+class _TutorialScreenState extends State<TutorialScreen> {
   List<MediaInfo> mediaList = [];
   List<String> urlList = [
     "https://youtu.be/3qftaXO1nzc",

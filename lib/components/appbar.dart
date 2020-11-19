@@ -24,7 +24,33 @@ class AppBarPageName extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         ClipOval(
           child: Material(
-            color: Colors.white, // button color
+            color: Colors.transparent, // button color
+            child: InkWell(
+              splashColor: kPrimaryAccentColor, // inkwell color
+              child: SizedBox(
+                width: 56,
+                height: 56,
+                child: Icon(
+                  Icons.help,
+                  color: kPrimaryAccentColor,
+                ),
+              ),
+              onTap: () {
+//                Navigator.push(context, MaterialPageRoute(
+//                  builder: (context) {
+//                    return DashBoard();
+//                  },
+//                ));
+              },
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        ClipOval(
+          child: Material(
+            color: Colors.transparent, // button color
             child: InkWell(
               splashColor: kPrimaryAccentColor, // inkwell color
               child: SizedBox(
@@ -32,7 +58,7 @@ class AppBarPageName extends StatelessWidget implements PreferredSizeWidget {
                 height: 56,
                 child: Icon(
                   Icons.home,
-                  color: kIconColor,
+                  color: kPrimaryAccentColor,
                 ),
               ),
               onTap: () {
@@ -46,7 +72,7 @@ class AppBarPageName extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         SizedBox(
-          width: 10,
+          width: 28,
         ),
       ],
     );

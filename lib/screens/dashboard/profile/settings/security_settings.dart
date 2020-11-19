@@ -17,11 +17,11 @@ import 'package:udhaar/providers/firebase_functions.dart';
 import 'package:udhaar/providers/general_provider.dart';
 import '../Components/background_setting.dart';
 
-class Security_Settings_State extends StatefulWidget {
-  Security_Settings createState() => Security_Settings();
+class SecuritySettingsState extends StatefulWidget {
+  SecuritySettings createState() => SecuritySettings();
 }
 
-class Security_Settings extends State<Security_Settings_State> {
+class SecuritySettings extends State<SecuritySettingsState> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   LinearGradient mainButton = LinearGradient(
       colors: [Color(0xFF2b580c), Color(0xFF2b580c), Color(0xFF2b580c)],
@@ -30,6 +30,7 @@ class Security_Settings extends State<Security_Settings_State> {
   List<BoxShadow> shadow = [
     BoxShadow(color: Colors.black12, offset: Offset(0, 3), blurRadius: 6)
   ];
+  // ignore: non_constant_identifier_names
   String new_password;
   String oldPassword;
   UserModel u;
@@ -42,7 +43,7 @@ class Security_Settings extends State<Security_Settings_State> {
         appBar: AppBarPageName(
           pageName: "Change Password",
         ),
-        body: Background_S(
+        body: BackgroundS(
           child: Column(
             children: [
               SizedBox(height: 15),
@@ -198,6 +199,8 @@ class Security_Settings extends State<Security_Settings_State> {
                         DialogButton(
                           color: Colors.white,
                           height: 0,
+                          child: SizedBox(height: 0),
+                          onPressed: () {},
                         ),
                       ]).show();
                 },

@@ -4,6 +4,7 @@ class UserModel {
   String email;
   String createdDate;
   String lastPassChangeDate;
+  List<String> friendList;
 
   UserModel({
     this.userID,
@@ -11,8 +12,10 @@ class UserModel {
     this.email,
     this.createdDate,
     this.lastPassChangeDate,
+    this.friendList,
   });
 
+  // ignore: non_constant_identifier_names
   void print_user() {
     print(this.userID);
     print(this.fullName);

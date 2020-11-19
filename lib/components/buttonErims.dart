@@ -1,7 +1,6 @@
 import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:udhaar/components/h2.dart';
 import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/constants.dart';
 

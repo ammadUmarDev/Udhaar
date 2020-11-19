@@ -6,6 +6,7 @@ import 'package:udhaar/components/h1.dart';
 import 'package:udhaar/components/h2.dart';
 import 'package:udhaar/constants.dart';
 import 'package:udhaar/screens/dashboard/profile/faq_page.dart';
+import 'package:udhaar/screens/dashboard/stats/friend_manager.dart';
 import 'package:udhaar/screens/tutorial/tutorial_screen.dart';
 import '../components/main_background.dart';
 
@@ -56,9 +57,9 @@ class _DashboardStatsState extends State<DashboardStats> {
 //                            color: Colors.white,
 //                            height: 0,
 //                          ),
-//                        ]).show();
+//                        ]).
                     Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => Tutorial_Screen()));
+                        MaterialPageRoute(builder: (_) => TutorialScreen()));
                   },
                   icon: Icon(
                     FontAwesomeIcons.tv,
@@ -77,7 +78,16 @@ class _DashboardStatsState extends State<DashboardStats> {
           ),
           Container(
             child: Row(
-              children: [],
+              children: [
+                IconButton(
+                    onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => FriendManager())),
+                    icon: Icon(
+                      FontAwesomeIcons.userPlus,
+                      size: iconSize,
+                      color: kTextLightColor,
+                    )),
+              ],
             ),
           ),
         ],
@@ -115,6 +125,16 @@ class _DashboardStatsState extends State<DashboardStats> {
                             FontAwesomeIcons.moneyBillWave, 'PKR. 0'),
                         cardDetails(
                             'Money Owed', FontAwesomeIcons.wallet, 'PKR. 0'),
+                      ],
+                    ),
+                    SizedBox(height: 10.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        cardDetails(
+                            'Total Friends', FontAwesomeIcons.users, '1'),
+                        cardDetails(
+                            'Friend Requests', FontAwesomeIcons.users, '0'),
                       ],
                     ),
                   ],

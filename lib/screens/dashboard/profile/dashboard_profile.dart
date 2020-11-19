@@ -1,6 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:udhaar/components/appbar.dart';
@@ -10,8 +9,8 @@ import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/models/User_Model.dart';
 import 'package:udhaar/providers/general_provider.dart';
 import 'package:udhaar/screens/dashboard/profile/settings/general_settings_screen.dart';
+import 'package:udhaar/screens/dashboard/stats/friend_manager.dart';
 import '../../../constants.dart';
-import '../components/main_background.dart';
 import 'about_us.dart';
 import 'faq_page.dart';
 
@@ -57,7 +56,7 @@ class _DashboardProfileState extends State<DashboardProfile> {
                   BodyText(
                       textBody: user == null
                           ? "Loading..."
-                          : user.userID.substring(0, 25)),
+                          : user.userID.substring(0, 10)),
                   SizedBox(height: 10),
                   H3(textBody: "Email:"),
                   SizedBox(height: 5),
@@ -132,6 +131,16 @@ class _DashboardProfileState extends State<DashboardProfile> {
                   ),
                 ),
                 SizedBox(height: 5),
+                ListTile(
+                  title: Text('Manage Friends'),
+                  subtitle: Text('Add and Remove Friends'),
+                  leading: Icon(FontAwesomeIcons.userPlus),
+                  trailing:
+                      Icon(Icons.chevron_right, color: kPrimaryLightColor),
+                  onTap: () => Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (_) => FriendManager())),
+                ),
+                Divider(),
                 ListTile(
                   title: Text('General Settings'),
                   subtitle: Text('Change account details and logout'),

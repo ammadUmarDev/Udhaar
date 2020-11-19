@@ -2,7 +2,6 @@ import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -16,7 +15,6 @@ import 'package:udhaar/components/text_Field_outlined.dart';
 import 'package:udhaar/models/User_Model.dart';
 import 'package:udhaar/providers/firebase_functions.dart';
 import 'package:udhaar/providers/general_provider.dart';
-import 'package:udhaar/results_screen/GoogleDone.dart';
 import 'package:udhaar/screens/authentication_handler/components/background.dart';
 import 'package:udhaar/screens/dashboard/dashboard.dart';
 import 'package:intl/intl.dart';
@@ -147,6 +145,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   lastPassChangeDate: DateFormat("dd/MM/yyyy")
                       .format(DateTime.now())
                       .toString(),
+                  friendList: [],
                 );
                 signupFirebaseDb(createdUserModelObj).then((retUser) async {
                   try {
@@ -175,7 +174,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     print(e);
                   }
                 });
-                ;
               }
             }
           } catch (e) {
@@ -188,6 +186,7 @@ class _RegisterPageState extends State<RegisterPage> {
       labelText: "SIGN UP",
     );
 
+    // ignore: non_constant_identifier_names
     Widget SiginForm = Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -227,98 +226,103 @@ class _RegisterPageState extends State<RegisterPage> {
         color: kPrimaryAccentColor,
         child: CustomPaint(
           painter: AuthBackground(),
-          child: Stack(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 28.0),
-                child: ListView(
-                  children: <Widget>[
-                    SizedBox(height: MediaQuery.of(context).size.height / 10),
-                    welcome,
-                    subTitle,
-                    SizedBox(height: MediaQuery.of(context).size.height / 20),
-                    SiginForm,
-                    SizedBox(height: MediaQuery.of(context).size.height / 20),
-                    Center(child: OrDivider()),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            bottomLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
-                            bottomRight: Radius.circular(20)),
-                      ),
-                      margin:
-                          EdgeInsets.only(left: 40.0, right: 40.0, bottom: 20),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: RaisedButton(
+          child: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left: 28.0),
+                  child: ListView(
+                    children: <Widget>[
+                      SizedBox(height: MediaQuery.of(context).size.height / 10),
+                      welcome,
+                      subTitle,
+                      SizedBox(height: MediaQuery.of(context).size.height / 20),
+                      SiginForm,
+                      SizedBox(height: MediaQuery.of(context).size.height / 20),
+                      Center(child: OrDivider()),
+                      Container(
+                        decoration: BoxDecoration(
                           color: Colors.white,
-                          child: Row(
-                            children: <Widget>[
-                              Image.asset(
-                                'assets/google_logo.png',
-                                height: 25.0,
-                              ),
-                              Container(
-                                margin: EdgeInsets.symmetric(horizontal: 20.0),
-                                child: H2(
-                                  textBody: 'Continue with Google',
-                                ),
-                              ),
-                            ],
-                          ),
-                          onPressed: () {
-                            Alert(
-                                context: context,
-                                title: "Coming Soon",
-                                style: AlertStyle(
-                                  titleStyle:
-                                      H2TextStyle(color: kPrimaryAccentColor),
-                                ),
-                                content: Column(
-                                  children: <Widget>[
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    H3(
-                                        textBody:
-                                            "Stay tuned for the next update :)"),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                  ],
-                                ),
-                                buttons: [
-                                  DialogButton(
-                                    color: Colors.white,
-                                    height: 0,
-                                  ),
-                                ]).show();
-                          },
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              bottomLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                              bottomRight: Radius.circular(20)),
                         ),
-                      ),
-                    ),
-                    AlreadyHaveAnAccountCheck(
-                      login: false,
-                      press: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return LoginPage();
+                        margin: EdgeInsets.only(
+                            left: 40.0, right: 40.0, bottom: 20),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: RaisedButton(
+                            color: Colors.white,
+                            child: Row(
+                              children: <Widget>[
+                                Image.asset(
+                                  'assets/google_logo.png',
+                                  height: 25.0,
+                                ),
+                                Container(
+                                  margin:
+                                      EdgeInsets.symmetric(horizontal: 20.0),
+                                  child: H2(
+                                    textBody: 'Continue with Google',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            onPressed: () {
+                              Alert(
+                                  context: context,
+                                  title: "Coming Soon",
+                                  style: AlertStyle(
+                                    titleStyle:
+                                        H2TextStyle(color: kPrimaryAccentColor),
+                                  ),
+                                  content: Column(
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      H3(
+                                          textBody:
+                                              "Stay tuned for the next update :)"),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                    ],
+                                  ),
+                                  buttons: [
+                                    DialogButton(
+                                      color: Colors.white,
+                                      height: 0,
+                                      child: SizedBox(height: 0),
+                                      onPressed: () {},
+                                    ),
+                                  ]).show();
                             },
                           ),
-                        );
-                      },
-                    ),
-                    SizedBox(height: MediaQuery.of(context).size.height / 20),
+                        ),
+                      ),
+                      AlreadyHaveAnAccountCheck(
+                        login: false,
+                        press: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return LoginPage();
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(height: MediaQuery.of(context).size.height / 20),
 //                  forgotPassword
-                  ],
-                ),
-              )
-            ],
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
