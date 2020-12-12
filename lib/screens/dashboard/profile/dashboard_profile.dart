@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:udhaar/components/appbar.dart';
 import 'package:udhaar/components/body_text.dart';
 import 'package:udhaar/components/h2.dart';
@@ -11,6 +12,7 @@ import 'package:udhaar/providers/general_provider.dart';
 import 'package:udhaar/screens/dashboard/profile/settings/general_settings_screen.dart';
 import 'package:udhaar/screens/dashboard/stats/friend_manager.dart';
 import '../../../constants.dart';
+import '../dashboard.dart';
 import 'about_us.dart';
 import 'faq_page.dart';
 
@@ -38,6 +40,80 @@ class _DashboardProfileState extends State<DashboardProfile> {
   Widget build(BuildContext context) {
     userImagePath = "assets/icons/custIcon.png";
     user = Provider.of<General_Provider>(context, listen: false).get_user();
+    Widget appBar = Padding(
+      padding: EdgeInsets.only(top: 30, bottom: 30),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          ClipOval(
+            child: Material(
+              color: Colors.transparent, // button color
+              child: InkWell(
+                splashColor: kPrimaryAccentColor, // inkwell color
+                child: Icon(
+                  Icons.help,
+                  color: kPrimaryAccentColor,
+                  size: 24,
+                ),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      Alert(
+                          context: context,
+                          title: "Profile Manager Help",
+                          style: AlertStyle(
+                            titleStyle: H2TextStyle(color: kPrimaryAccentColor),
+                          ),
+                          content: Column(
+                            children: <Widget>[
+                              SizedBox(
+                                height: 10,
+                              ),
+                              H3(
+                                  textBody:
+                                      "View and edit profile information, manage friends, read FAQs and learn more about us."),
+                              SizedBox(
+                                height: 10,
+                              ),
+                            ],
+                          ),
+                          buttons: [
+                            DialogButton(
+                              color: Colors.white,
+                              height: 0,
+                            ),
+                          ]).show();
+                    },
+                  ));
+                },
+              ),
+            ),
+          ),
+          SizedBox(width: 30),
+          ClipOval(
+            child: Material(
+              color: Colors.transparent, // button color
+              child: InkWell(
+                splashColor: kPrimaryAccentColor, // inkwell color
+                child: Icon(
+                  Icons.home,
+                  color: kPrimaryAccentColor,
+                  size: 24,
+                ),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return DashBoard();
+                    },
+                  ));
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
     // ignore: missing_return
     Widget showDesciption() {
       return Padding(
@@ -92,7 +168,6 @@ class _DashboardProfileState extends State<DashboardProfile> {
 
     return Scaffold(
       backgroundColor: Color(0xffF9F9F9),
-      appBar: AppBarPageName(pageName: ""),
       body: SafeArea(
         top: true,
         child: SingleChildScrollView(
@@ -100,6 +175,7 @@ class _DashboardProfileState extends State<DashboardProfile> {
             padding: EdgeInsets.only(left: 20.0, right: 20.0),
             child: Column(
               children: <Widget>[
+                appBar,
                 CircleAvatar(
                   maxRadius: 45,
                   backgroundImage: AssetImage(userImagePath),

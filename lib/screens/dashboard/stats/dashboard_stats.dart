@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:udhaar/components/body_text.dart';
 import 'package:udhaar/components/h1.dart';
 import 'package:udhaar/components/h2.dart';
+import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/constants.dart';
 import 'package:udhaar/screens/dashboard/profile/faq_page.dart';
 import 'package:udhaar/screens/dashboard/stats/friend_manager.dart';
@@ -76,7 +77,8 @@ class _DashboardStatsState extends State<DashboardStats> {
                   )),
             ],
           ),
-          Container(
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
             child: Row(
               children: [
                 IconButton(
@@ -111,20 +113,36 @@ class _DashboardStatsState extends State<DashboardStats> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        cardDetails('Pending Loan Approval Requests',
-                            FontAwesomeIcons.moneyCheckAlt, '0'),
-                        cardDetails('Pending Paidback Confirmations',
-                            FontAwesomeIcons.moneyCheck, '0'),
+                        cardDetails(
+                            'Pending Loan Approval Requests',
+                            FontAwesomeIcons.stopwatch,
+                            FontAwesomeIcons.arrowUp,
+                            '0',
+                            kIconColor),
+                        cardDetails(
+                            'Pending Paidback Confirmations',
+                            FontAwesomeIcons.stopwatch,
+                            FontAwesomeIcons.check,
+                            '0',
+                            kIconColor),
                       ],
                     ),
                     SizedBox(height: 10.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        cardDetails('Money Lended',
-                            FontAwesomeIcons.moneyBillWave, 'PKR. 0'),
                         cardDetails(
-                            'Money Owed', FontAwesomeIcons.wallet, 'PKR. 0'),
+                            'Total Amount Lended',
+                            FontAwesomeIcons.moneyBillWave,
+                            FontAwesomeIcons.arrowUp,
+                            'PKR. 5000',
+                            kIconColor),
+                        cardDetails(
+                            'Total Amount Owed',
+                            FontAwesomeIcons.moneyBillWave,
+                            FontAwesomeIcons.arrowDown,
+                            'PKR. 0',
+                            kIconColor),
                       ],
                     ),
                     SizedBox(height: 10.0),
@@ -132,119 +150,31 @@ class _DashboardStatsState extends State<DashboardStats> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         cardDetails(
-                            'Total Friends', FontAwesomeIcons.users, '1'),
+                            'Total Friends Lended',
+                            FontAwesomeIcons.userFriends,
+                            FontAwesomeIcons.arrowUp,
+                            '1',
+                            kIconColor),
                         cardDetails(
-                            'Friend Requests', FontAwesomeIcons.users, '0'),
+                            'Total Friend Owed',
+                            FontAwesomeIcons.userFriends,
+                            FontAwesomeIcons.arrowDown,
+                            '0',
+                            kIconColor),
+                      ],
+                    ),
+                    SizedBox(height: 10.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        cardDetails('Total Friends', FontAwesomeIcons.users,
+                            FontAwesomeIcons.dotCircle, '2', Colors.white),
+                        cardDetails('Friend Requests', FontAwesomeIcons.users,
+                            FontAwesomeIcons.arrowDown, '0', kIconColor),
                       ],
                     ),
                   ],
                 )),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        top: 20, bottom: 5.0, left: 20, right: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        H1(
-                          textBody: "Friends Lended:",
-                          color: kPrimaryAccentColor,
-                        ),
-                        InkWell(
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(24))),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 8.0),
-                            child: Text(
-                              'View All',
-                              style: TextStyle(
-                                  color: kPrimaryAccentColor,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          onTap: () {
-//                            Navigator.push(
-//                              context,
-//                              MaterialPageRoute(
-//                                builder: (context) => CategoryListScreen(),
-//                              ),
-//                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 0, horizontal: 20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        BodyText(
-                          textBody: "Nothing to show :(",
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        top: 20, bottom: 5.0, left: 20, right: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        H1(
-                          textBody: "Friends Owed:",
-                          color: kPrimaryAccentColor,
-                        ),
-                        InkWell(
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(24))),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 8.0),
-                            child: Text(
-                              'View All',
-                              style: TextStyle(
-                                  color: kPrimaryAccentColor,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          onTap: () {
-//                            Navigator.push(
-//                              context,
-//                              MaterialPageRoute(
-//                                builder: (context) => CategoryListScreen(),
-//                              ),
-//                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 0, horizontal: 20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        BodyText(
-                          textBody: "Nothing to show :(",
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ];
             },
             body: Padding(
@@ -293,7 +223,8 @@ class _DashboardStatsState extends State<DashboardStats> {
     );
   }
 
-  Widget cardDetails(String title, IconData iconData, String valueCount) {
+  Widget cardDetails(String title, IconData iconData1, IconData iconData2,
+      String valueCount, Color icon2Color) {
     return Material(
       elevation: 4.0,
       borderRadius: BorderRadius.circular(7.0),
@@ -307,27 +238,34 @@ class _DashboardStatsState extends State<DashboardStats> {
             SizedBox(height: 20.0),
             Padding(
                 padding: EdgeInsets.only(left: 15.0),
-                child: Icon(
-                  iconData,
-                  size: iconSize,
-                  color: kIconColor,
+                child: Row(
+                  children: [
+                    Icon(
+                      iconData1,
+                      size: iconSize,
+                      color: kIconColor,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Icon(
+                        iconData2,
+                        size: iconSize,
+                        color: icon2Color,
+                      ),
+                    ),
+                  ],
                 )),
             SizedBox(height: 20.0),
             Padding(
               padding: EdgeInsets.only(left: 15.0),
-              child: Text(title,
-                  style: TextStyle(
-                    fontFamily: 'Quicksand',
-                    fontSize: 15.0,
-                    color: Colors.black,
-                  )),
+              child: Text(title, style: H3TextStyle(color: kTextDarkColor)),
             ),
             SizedBox(height: 10.0),
             Padding(
               padding: EdgeInsets.only(left: 15.0),
               child: H2(
                 textBody: valueCount,
-                color: Colors.red,
+                color: kPrimaryAccentColor,
               ),
             ),
             SizedBox(height: 20.0),

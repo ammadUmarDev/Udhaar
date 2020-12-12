@@ -1,12 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import '../constants.dart';
 import '../screens/dashboard/dashboard.dart';
 import 'h1.dart';
+import 'h2.dart';
+import 'h3.dart';
 
 class AppBarPageName extends StatelessWidget implements PreferredSizeWidget {
-  AppBarPageName({this.pageName});
+  AppBarPageName({this.pageName, this.helpAlertTitle, this.helpAlertBody});
   final pageName;
+  String helpAlertTitle;
+  String helpAlertBody;
+
   @override
   Size get preferredSize => const Size.fromHeight(55);
   Widget build(BuildContext context) {
@@ -36,17 +42,35 @@ class AppBarPageName extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               onTap: () {
-//                Navigator.push(context, MaterialPageRoute(
-//                  builder: (context) {
-//                    return DashBoard();
-//                  },
-//                ));
+                Alert(
+                    context: context,
+                    title: helpAlertTitle,
+                    style: AlertStyle(
+                      titleStyle: H2TextStyle(color: kPrimaryAccentColor),
+                    ),
+                    content: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 10,
+                        ),
+                        H3(textBody: helpAlertBody),
+                        SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                    buttons: [
+                      DialogButton(
+                        color: Colors.white,
+                        height: 0,
+                      ),
+                    ]).show();
               },
             ),
           ),
         ),
         SizedBox(
-          width: 10,
+          width: 0,
         ),
         ClipOval(
           child: Material(
@@ -72,7 +96,7 @@ class AppBarPageName extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         SizedBox(
-          width: 28,
+          width: 0,
         ),
       ],
     );

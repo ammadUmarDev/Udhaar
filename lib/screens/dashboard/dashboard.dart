@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:udhaar/components/body_text.dart';
+import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/constants.dart';
 import 'package:udhaar/screens/dashboard/profile/dashboard_profile.dart';
 import 'package:udhaar/screens/dashboard/request/dashboard_request.dart';
-import 'notification/dashboard_notification.dart';
 import 'stats/dashboard_stats.dart';
 
 class DashBoard extends StatefulWidget {
@@ -59,7 +60,6 @@ class _DashBoardState extends State<DashBoard> {
         children: <Widget>[
           DashboardStats(),
           DashboardRequest(),
-          DashboardNotification(),
           DashboardProfile(),
         ],
         controller: pageController,
@@ -73,27 +73,27 @@ class _DashBoardState extends State<DashBoard> {
         inactiveColor: kPrimaryLightColor.withOpacity(0.7),
         items: [
           BottomNavigationBarItem(
-//              title: H3(
-//                textBody: "Profile",
-//              ),
+            title: BodyText(
+              textBody: "Statistics",
+            ),
             icon: Icon(
               FontAwesomeIcons.piggyBank,
               size: iconSize,
             ),
           ),
           BottomNavigationBarItem(
+            title: BodyText(
+              textBody: "Requests",
+            ),
             icon: Icon(
               FontAwesomeIcons.moneyCheckAlt,
               size: iconSize,
             ),
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              FontAwesomeIcons.solidBell,
-              size: iconSize,
+            title: BodyText(
+              textBody: "Profile",
             ),
-          ),
-          BottomNavigationBarItem(
             icon: Icon(
               FontAwesomeIcons.solidUser,
               size: iconSize,
