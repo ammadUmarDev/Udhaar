@@ -146,6 +146,18 @@ class _RegisterPageState extends State<RegisterPage> {
                       .format(DateTime.now())
                       .toString(),
                   friendList: [],
+                  friendsLended: [],
+                  friendsOwed: [],
+                  pendingLoanApprovalsRequests: [],
+                  pendingPaybackConfirmations: [],
+                  pendingLoanApprovalsRequestsCount: 0,
+                  pendingPaybackConfirmationsCount: 0,
+                  totalAmountLended: 0.0,
+                  totalAmountOwed: 0.0,
+                  totalFriendsLended: 0,
+                  totalFriendsOwed: 0,
+                  totalFriends: 0,
+                  totalRequests: 0,
                 );
                 signupFirebaseDb(createdUserModelObj).then((retUser) async {
                   try {
@@ -233,7 +245,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: const EdgeInsets.only(left: 28.0),
                   child: ListView(
                     children: <Widget>[
-                      SizedBox(height: MediaQuery.of(context).size.height / 10),
+                      SizedBox(height: MediaQuery.of(context).size.height / 20),
                       welcome,
                       subTitle,
                       SizedBox(height: MediaQuery.of(context).size.height / 20),

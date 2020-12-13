@@ -9,12 +9,12 @@ class UserModel {
   List<String> friendList;
   List<String> friendsLended;
   List<String> friendsOwed;
-  List<String> PendingLoanApprovalsRequests;
-  List<String> PendingPaybackConfirmations;
-  int PendingLoanApprovalsRequestsCount;
-  int PendingPaybackConfirmationsCount;
-  Float TotalAmountLended;
-  Float TotalAmountOwed;
+  List<String> pendingLoanApprovalsRequests;
+  List<String> pendingPaybackConfirmations;
+  int pendingLoanApprovalsRequestsCount;
+  int pendingPaybackConfirmationsCount;
+  double totalAmountLended;
+  double totalAmountOwed;
   int totalFriendsLended;
   int totalFriendsOwed;
   int totalFriends;
@@ -29,12 +29,12 @@ class UserModel {
       this.friendList,
       this.friendsLended,
       this.friendsOwed,
-      this.PendingLoanApprovalsRequests,
-      this.PendingLoanApprovalsRequestsCount,
-      this.PendingPaybackConfirmations,
-      this.PendingPaybackConfirmationsCount,
-      this.TotalAmountLended,
-      this.TotalAmountOwed,
+      this.pendingLoanApprovalsRequests,
+      this.pendingLoanApprovalsRequestsCount,
+      this.pendingPaybackConfirmations,
+      this.pendingPaybackConfirmationsCount,
+      this.totalAmountLended,
+      this.totalAmountOwed,
       this.totalFriends,
       this.totalFriendsLended,
       this.totalFriendsOwed,

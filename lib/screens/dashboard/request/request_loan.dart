@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:udhaar/components/appbar.dart';
@@ -12,7 +14,9 @@ import 'package:udhaar/components/h2.dart';
 import 'package:udhaar/components/h3.dart';
 import 'package:udhaar/components/rounded_button.dart';
 import 'package:udhaar/components/rounded_input_field.dart';
+import 'package:udhaar/models/Loan_Model.dart';
 import 'package:udhaar/models/User_Model.dart';
+import 'package:udhaar/providers/firebase_functions.dart';
 import 'package:udhaar/providers/general_provider.dart';
 import 'package:udhaar/screens/dashboard/stats/components/grid_tile_user.dart';
 import 'package:udhaar/screens/dashboard/stats/search_user.dart';
@@ -26,13 +30,17 @@ class RequestLoan extends StatefulWidget {
 class _RequestLoanState extends State<RequestLoan> {
   String userImagePath;
   List<String> friendsList;
+  int lamount;
+  int ltenure;
+  Set inputformat = Set();
   @override
-  Future<void> initState() {
+  void initState() {
     getUser();
+    inputformat.add(FilteringTextInputFormatter.allow(RegExp('[0-9]')));
   }
 
-  Future<void> getUser() async {
-    return await FirebaseFirestore.instance
+  void getUser() async {
+    await FirebaseFirestore.instance
         .collection('Users')
         .doc(Provider.of<General_Provider>(context, listen: false)
             .firebaseUser
@@ -49,6 +57,22 @@ class _RequestLoanState extends State<RequestLoan> {
           lastPassChangeDate:
               documentSnapshot.data()["Last_Pass_Change_Date"].toString(),
           friendList: documentSnapshot.data()["Friend_List"].split(","),
+          friendsLended: List.from(documentSnapshot.data()["Friends_Lended"]),
+          friendsOwed: List.from(documentSnapshot.data()["Friends_Owed"]),
+          pendingLoanApprovalsRequests: List.from(
+              documentSnapshot.data()["Pending_Loan_Approvals_Requests"]),
+          pendingPaybackConfirmations: List.from(
+              documentSnapshot.data()["Pending_Payback_Confirmations"]),
+          pendingLoanApprovalsRequestsCount:
+              documentSnapshot.data()["Pending_Loan_Approvals_Requests_Count"],
+          pendingPaybackConfirmationsCount:
+              documentSnapshot.data()["Pending_Payback_Confirmations_Count"],
+          totalAmountLended: documentSnapshot.data()["Total_Amount_Lended"],
+          totalAmountOwed: documentSnapshot.data()["Total_Amount_Owed"],
+          totalFriendsLended: documentSnapshot.data()["Total_Friends_Lended"],
+          totalFriendsOwed: documentSnapshot.data()["Total_Friends_Owed"],
+          totalFriends: documentSnapshot.data()["Total_Friends"],
+          totalRequests: documentSnapshot.data()["Total_Requests"],
         );
         setState(() {
           Provider.of<General_Provider>(context, listen: false)
@@ -75,7 +99,8 @@ class _RequestLoanState extends State<RequestLoan> {
                 onTap: () {
                   Alert(
                       context: context,
-                      title: "Coming Soon",
+                      title: "Request Loan from " +
+                          e.value.substring(0, e.value.indexOf("@")),
                       style: AlertStyle(
                         titleStyle: H2TextStyle(color: kPrimaryAccentColor),
                       ),
@@ -84,9 +109,70 @@ class _RequestLoanState extends State<RequestLoan> {
                           SizedBox(
                             height: 10,
                           ),
-                          H3(textBody: "Stay tuned for the next update :)"),
-                          SizedBox(
-                            height: 10,
+                          RoundedInputField(
+                            hintText: "Amount: (PKR)",
+                            icon: FontAwesomeIcons.piggyBank,
+                            onChanged: (value) {
+                              setState(() {
+                                this.lamount = int.parse(value);
+                              });
+                            },
+                            keyboardType: TextInputType.number,
+                          ),
+                          RoundedInputField(
+                            hintText: "Tenure: (Months)",
+                            icon: FontAwesomeIcons.businessTime,
+                            onChanged: (value) {
+                              setState(() {
+                                this.ltenure = int.parse(value);
+                              });
+                            },
+                            keyboardType: TextInputType.number,
+                          ),
+//                          SizedBox(
+//                            height: 5,
+//                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              RoundedButton(
+                                text: "Cancel",
+                                textColor: kTextDarkColor,
+                                press: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              ButtonLoading(
+                                labelText: "Confirm",
+                                onTap: () async {
+//                                  Provider.of<General_Provider>(context,
+//                                          listen: false)
+//                                      .user
+//                                      .friendList
+//                                      .add(tempObj.email);
+                                  LoanModel loanObj = LoanModel(
+                                    loanFrom: Provider.of<General_Provider>(
+                                            context,
+                                            listen: false)
+                                        .user
+                                        .email,
+                                    loanTo: e.value,
+                                    status: "Unpaid",
+                                    amount: lamount,
+                                    tenure: ltenure,
+                                    date: DateFormat("dd/MM/yyyy")
+                                        .format(DateTime.now())
+                                        .toString(),
+                                  );
+                                  loanObj.print_loan();
+                                  addLoanToDb(loanObj)
+                                      .then((retLoanBool) async {
+                                    print("Loan added to db");
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -116,12 +202,18 @@ class _RequestLoanState extends State<RequestLoan> {
                             height: 10,
                           ),
                           Icon(
-                            FontAwesomeIcons.userMinus,
+                            FontAwesomeIcons.handHoldingUsd,
                             color: kIconColor,
                             size: iconSize,
                           ),
                           SizedBox(
                             height: 10,
+                          ),
+                          H2(
+                              textBody:
+                                  e.value.substring(0, e.value.indexOf('@'))),
+                          SizedBox(
+                            height: 5,
                           ),
                           H3(textBody: e.value),
                           SizedBox(
@@ -192,8 +284,8 @@ class _RequestLoanState extends State<RequestLoan> {
                               color: kTextLightColor,
                             )),
                         onTap: () {
-                          setState(() async {
-                            await getUser();
+                          setState(() {
+                            getUser();
                           });
                         },
                       ),

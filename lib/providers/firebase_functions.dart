@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:udhaar/models/Loan_Model.dart';
 import 'dart:io';
 
 import 'package:udhaar/models/User_Model.dart';
@@ -83,6 +84,22 @@ Future<UserModel> getUserDocFirebase(String userId) async {
         lastPassChangeDate:
             documentSnapshot.data()["Last_Pass_Change_Date"].toString(),
         friendList: documentSnapshot.data()["Friend_List"].split(","),
+        friendsLended: documentSnapshot.data()["Friends_Lended"],
+        friendsOwed: documentSnapshot.data()["Friends_Owed"],
+        pendingLoanApprovalsRequests:
+            documentSnapshot.data()["Pending_Loan_Approvals_Requests"],
+        pendingPaybackConfirmations:
+            documentSnapshot.data()["Pending_Payback_Confirmations"],
+        pendingLoanApprovalsRequestsCount:
+            documentSnapshot.data()["Pending_Loan_Approvals_Requests_Count"],
+        pendingPaybackConfirmationsCount:
+            documentSnapshot.data()["Pending_Payback_Confirmations_Count"],
+        totalAmountLended: documentSnapshot.data()["Total_Amount_Lended"],
+        totalAmountOwed: documentSnapshot.data()["Total_Amount_Owed"],
+        totalFriendsLended: documentSnapshot.data()["Total_Friends_Lended"],
+        totalFriendsOwed: documentSnapshot.data()["Total_Friends_Owed"],
+        totalFriends: documentSnapshot.data()["Total_Friends"],
+        totalRequests: documentSnapshot.data()["Total_Requests"],
       );
       return returnUserModel;
     } else {
@@ -103,8 +120,47 @@ Future<bool> signupFirebaseDb(UserModel user) async {
       'Email': user.email.toString(),
       'Created_Date': user.createdDate.toString(),
       'Last_Pass_Change_Date': user.lastPassChangeDate.toString(),
-      'Friend_List': user.friendList
-          .join(',') //    new DateFormat("dd/MM/yyyy").parse("11/11/2011");
+      'Friend_List': user.friendList.join(','),
+//      'friends_Lended': user.friendsLended.join(','),
+//      'friends_Owed': user.friendsOwed.join(','),
+//      'Pending_Loan_Approvals_Requests':
+//          user.PendingLoanApprovalsRequests.join(','),
+//      'Pending_Payback_Confirmations':
+//          user.PendingPaybackConfirmations.join(','),
+      'Friends_Lended': user.friendsLended,
+      'Friends_Owed': user.friendsOwed,
+      'Pending_Loan_Approvals_Requests': user.pendingLoanApprovalsRequests,
+      'Pending_Payback_Confirmations': user.pendingPaybackConfirmations,
+      'Pending_Loan_Approvals_Requests_Count':
+          user.pendingLoanApprovalsRequestsCount,
+      'Pending_Payback_Confirmations_Count':
+          user.pendingPaybackConfirmationsCount,
+      'Total_Amount_Lended': user.totalAmountLended,
+      'Total_Amount_Owed': user.totalAmountOwed,
+      'Total_Friends_Lended': user.totalFriendsLended,
+      'Total_Friends_Owed': user.totalFriendsOwed,
+      'Total_Friends': user.totalFriends,
+      'Total_Requests': user.totalRequests,
+      //    new DateFormat("dd/MM/yyyy").parse("11/11/2011");
+    });
+  }
+  return true;
+}
+
+Future<bool> addLoanToDb(LoanModel loanObj) async {
+  CollectionReference loans = FirebaseFirestore.instance.collection('Loans');
+  bool internetCheckVar = await internetCheck();
+  if (internetCheckVar == false)
+    return false;
+  else {
+    await loans.doc().set({
+      'Loan_From': loanObj.loanFrom.toString(),
+      'Loan_To': loanObj.loanTo.toString(),
+      'Status': loanObj.status.toString(),
+      'Amount': loanObj.amount,
+      'Tenure': loanObj.tenure,
+      'Date': loanObj.date,
+      //    new DateFormat("dd/MM/yyyy").parse("11/11/2011");
     });
   }
   return true;

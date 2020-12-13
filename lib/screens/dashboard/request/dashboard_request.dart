@@ -17,6 +17,7 @@ import 'package:udhaar/screens/dashboard/profile/settings/general_settings_scree
 import 'package:udhaar/screens/dashboard/request/friends_lended.dart';
 import 'package:udhaar/screens/dashboard/request/friends_owed.dart';
 import 'package:udhaar/screens/dashboard/request/loan_approval_requests.dart';
+import 'package:udhaar/screens/dashboard/request/pending_paidback_confirmations.dart';
 import 'package:udhaar/screens/dashboard/request/request_loan.dart';
 import 'package:udhaar/screens/dashboard/stats/components/grid_tile_user.dart';
 import 'package:udhaar/screens/dashboard/stats/friend_manager.dart';
@@ -529,8 +530,11 @@ class _DashboardRequestState extends State<DashboardRequest> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 5.0),
-                            child: cardDetails(
-                                () {},
+                            child: cardDetails(() {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (_) =>
+                                      PendingPaidbackConfirmations()));
+                            },
                                 'Pending Paidback Confirmations',
                                 FontAwesomeIcons.stopwatch,
                                 FontAwesomeIcons.check,

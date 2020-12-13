@@ -1,40 +1,34 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:udhaar/components/appbar.dart';
 import 'package:udhaar/components/body_text.dart';
-import 'package:udhaar/components/button_loading.dart';
 import 'package:udhaar/components/h1.dart';
 import 'package:udhaar/components/h2.dart';
 import 'package:udhaar/components/h3.dart';
-import 'package:udhaar/components/rounded_button.dart';
-import 'package:udhaar/components/rounded_input_field.dart';
 import 'package:udhaar/models/User_Model.dart';
 import 'package:udhaar/providers/general_provider.dart';
-import 'package:udhaar/screens/dashboard/stats/components/grid_tile_user.dart';
-import 'package:udhaar/screens/dashboard/stats/search_user.dart';
+
 import '../../../constants.dart';
 
-class LoanApprovalRequests extends StatefulWidget {
+class PendingPaidbackConfirmations extends StatefulWidget {
   @override
-  _LoanApprovalRequestsState createState() => _LoanApprovalRequestsState();
+  _PendingPaidbackConfirmationsState createState() =>
+      _PendingPaidbackConfirmationsState();
 }
 
-class _LoanApprovalRequestsState extends State<LoanApprovalRequests> {
-  String userImagePath;
-  List<String> Pending_Loan_Approvals_Requests;
+class _PendingPaidbackConfirmationsState
+    extends State<PendingPaidbackConfirmations> {
+  List<String> pendingPaybackConfirmations;
   @override
   Future<void> initState() {
     getUser();
   }
 
-  void getUser() async {
+  Future<void> getUser() async {
     return await FirebaseFirestore.instance
         .collection('Users')
         .doc(Provider.of<General_Provider>(context, listen: false)
@@ -72,10 +66,10 @@ class _LoanApprovalRequestsState extends State<LoanApprovalRequests> {
         setState(() {
           Provider.of<General_Provider>(context, listen: false)
                   .user
-                  .pendingLoanApprovalsRequests =
-              retGetUserObjFirebase.pendingLoanApprovalsRequests;
-          Pending_Loan_Approvals_Requests =
-              retGetUserObjFirebase.pendingLoanApprovalsRequests;
+                  .pendingPaybackConfirmations =
+              retGetUserObjFirebase.pendingPaybackConfirmations;
+          pendingPaybackConfirmations =
+              retGetUserObjFirebase.pendingPaybackConfirmations;
         });
       }
     });
@@ -83,12 +77,12 @@ class _LoanApprovalRequestsState extends State<LoanApprovalRequests> {
 
   @override
   Widget build(BuildContext context) {
-    Widget pendingLoanApprovalsRequests = Column(
+    Widget pendingPaybackConfirmations = Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: Provider.of<General_Provider>(context, listen: false)
             .user
-            .pendingLoanApprovalsRequests
+            .pendingPaybackConfirmations
             .asMap()
             .entries
             .map(
@@ -137,7 +131,7 @@ class _LoanApprovalRequestsState extends State<LoanApprovalRequests> {
                             height: 10,
                           ),
                           Icon(
-                            FontAwesomeIcons.moneyBillAlt,
+                            FontAwesomeIcons.userMinus,
                             color: kIconColor,
                             size: iconSize,
                           ),
@@ -149,7 +143,7 @@ class _LoanApprovalRequestsState extends State<LoanApprovalRequests> {
                             height: 5,
                           ),
                           BodyText(
-                            textBody: "Tap me to approve loan",
+                            textBody: "Tap me to request loan",
                           ),
                           SizedBox(
                             height: 10,
@@ -163,9 +157,9 @@ class _LoanApprovalRequestsState extends State<LoanApprovalRequests> {
     return Scaffold(
       backgroundColor: Color(0xffF9F9F9),
       appBar: AppBarPageName(
-        pageName: "Loan Approval Requests",
-        helpAlertTitle: "Loan Request Status",
-        helpAlertBody: "Loan request successfully approved :)",
+        pageName: "Paidback Confirmations",
+        helpAlertTitle: "Loan Payback Confirmations Help",
+        helpAlertBody: "Tap to confirm whether loan is returned or not.",
       ),
       body: SafeArea(
         top: true,
@@ -190,7 +184,7 @@ class _LoanApprovalRequestsState extends State<LoanApprovalRequests> {
             body: Padding(
               padding:
                   const EdgeInsets.symmetric(vertical: 10, horizontal: 5.0),
-              child: pendingLoanApprovalsRequests,
+              child: pendingPaybackConfirmations,
             ),
           ),
         ),
