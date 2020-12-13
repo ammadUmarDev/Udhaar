@@ -113,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
             if (authCheckFields == true) {
               final signInUser = (await FirebaseAuth.instance
                       .signInWithEmailAndPassword(
-                          email: "zubbii@gmail.com",
+                          email: emailTextField.getReturnValue().trim(),
                           password: passwordTextField.getReturnValue().trim()))
                   .user;
               print("we here ");

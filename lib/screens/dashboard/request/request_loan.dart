@@ -25,286 +25,120 @@ class RequestLoan extends StatefulWidget {
 
 class _RequestLoanState extends State<RequestLoan> {
   String userImagePath;
+  List<String> friendsList;
+  @override
+  Future<void> initState() {
+    getUser();
+  }
+
+  Future<void> getUser() async {
+    return await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(Provider.of<General_Provider>(context, listen: false)
+            .firebaseUser
+            .uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        print('Document exist on the database');
+        UserModel retGetUserObjFirebase = UserModel(
+          email: documentSnapshot.data()["Email"].toString(),
+          fullName: documentSnapshot.data()["Full_Name"].toString(),
+          userID: documentSnapshot.data()["User_Id"].toString(),
+          createdDate: documentSnapshot.data()["Created_Date"].toString(),
+          lastPassChangeDate:
+              documentSnapshot.data()["Last_Pass_Change_Date"].toString(),
+          friendList: documentSnapshot.data()["Friend_List"].split(","),
+        );
+        setState(() {
+          Provider.of<General_Provider>(context, listen: false)
+              .user
+              .friendList = retGetUserObjFirebase.friendList;
+          friendsList = retGetUserObjFirebase.friendList;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    //TODO: fix query, fix remove a friend
-    Widget myFriends = StreamBuilder<QuerySnapshot>(
-        stream: Firestore.instance.collection("Users").limit(2).snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-                child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(top: 50.0),
-                ),
-                H3(
-                  textBody: "Error in fetching users: ${snapshot.error}.",
-                )
-              ],
-            ));
-          }
-
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return Center(
-                  child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 50.0),
-                  ),
-                  H3(
-                    textBody: "Not connected to the Stream or null.",
-                  )
-                ],
-              ));
-
-            case ConnectionState.waiting:
-              return Center(
-                  child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 50.0),
-                  ),
-                  H3(
-                    textBody: "Awaiting for interaction.",
-                  )
-                ],
-              ));
-
-            case ConnectionState.active:
-              print("Stream has started but not finished");
-
-              var totalUserCount = 0;
-              List<DocumentSnapshot> userDocs;
-
-              if (snapshot.hasData) {
-                userDocs = snapshot.data.docs;
-                totalUserCount = userDocs.length;
-
-                if (totalUserCount > 0) {
-                  return GridView.builder(
-                      itemCount: totalUserCount,
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      primary: false,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3),
-                      itemBuilder: (BuildContext context, int index) {
-                        if (userDocs[index].data()["Email"] !=
-                            Provider.of<General_Provider>(context,
-                                    listen: false)
-                                .user
-                                .email) {
-                          UserModel tempObj = UserModel(
-                            email: userDocs[index].data()["Email"].toString(),
-                            fullName:
-                                userDocs[index].data()["Full_Name"].toString(),
-                            userID:
-                                userDocs[index].data()["User_Id"].toString(),
-                            createdDate: userDocs[index]
-                                .data()["Created_Date"]
-                                .toString(),
-                            lastPassChangeDate: userDocs[index]
-                                .data()["Last_Pass_Change_Date"]
-                                .toString(),
-                            friendList: userDocs[index]
-                                .data()["Friend_List"]
-                                .split(","),
-                          );
-                          return Center(
-                            child: Card(
-                              child: InkWell(
-                                splashColor: Colors.blue.withAlpha(30),
-                                onTap: () {
-                                  print('Tapped on user.');
-                                  Alert(
-                                      context: context,
-                                      title: "Request a Loan From " +
-                                          tempObj.fullName,
-                                      style: AlertStyle(
-                                        titleStyle: H2TextStyle(
-                                            color: kPrimaryAccentColor),
-                                      ),
-                                      content: Column(
-                                        children: <Widget>[
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          RoundedInputField(
-                                            hintText: "Amount: (PKR)",
-                                            icon: FontAwesomeIcons.piggyBank,
-                                          ),
-                                          RoundedInputField(
-                                            hintText: "Tenure: (Months)",
-                                            icon: FontAwesomeIcons.businessTime,
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              RoundedButton(
-                                                text: "Cancel",
-                                                textColor: kTextDarkColor,
-                                                press: () {
-                                                  Navigator.pop(context);
-                                                },
-                                              ),
-                                              ButtonLoading(
-                                                labelText: "Confirm",
-                                                onTap: () async {
-                                                  Provider.of<General_Provider>(
-                                                          context,
-                                                          listen: false)
-                                                      .user
-                                                      .friendList
-                                                      .add(tempObj.email);
-                                                  FirebaseFirestore db =
-                                                      FirebaseFirestore
-                                                          .instance;
-                                                  CollectionReference users =
-                                                      db.collection('Users');
-                                                  bool checkUpdateFriendList =
-                                                      false;
-                                                  await users
-                                                      .doc(Provider.of<
-                                                                  General_Provider>(
-                                                              context,
-                                                              listen: false)
-                                                          .firebaseUser
-                                                          .uid)
-                                                      .update({
-                                                        'Friend_List': Provider
-                                                                .of<General_Provider>(
-                                                                    context,
-                                                                    listen:
-                                                                        false)
-                                                            .user
-                                                            .friendList
-                                                            .join(",")
-                                                      })
-                                                      .then((value) =>
-                                                          checkUpdateFriendList =
-                                                              true)
-                                                      .catchError((error) => print(
-                                                          "Failed to update user: $error"));
-                                                  if (checkUpdateFriendList ==
-                                                      true) {
-                                                    print(
-                                                        "User added to friendlist");
-                                                    Navigator.pop(context);
-                                                  }
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      buttons: [
-                                        DialogButton(
-                                          color: Colors.white,
-                                          height: 0,
-                                          child: SizedBox(height: 0),
-                                          onPressed: () {},
-                                        ),
-                                      ]).show();
-                                },
-                                child: Container(
-                                  child: GridTileUser(
-                                    userObj: tempObj,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        } else {
-                          return InkWell(
-                            onTap: () async {},
-                            child: Card(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(10.0),
-                                  ),
-                                ),
-                                elevation: 0,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Icon(
-                                        FontAwesomeIcons.userPlus,
-                                        color: kIconColor,
-                                        size: iconSize,
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      H3(textBody: "Display Name"),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      BodyText(
-                                        textBody: "Tap to add friend",
-                                      ),
-                                    ],
-                                  ),
-                                )),
-                          );
-                        }
-                      });
-                }
-              }
-              return Center(
-                  child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 50.0),
-                  ),
-                  H3(
-                    textBody: "No users found :(",
-                  )
-                ],
-              ));
-
-            case ConnectionState.done:
-              return Center(
-                  child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 50.0),
-                  ),
-                  H3(
-                    textBody: "All users fetched.",
-                  )
-                ],
-              ));
-          }
-
-          return Container(
-            child: Center(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 50.0),
-                  ),
-                  H3(
-                    textBody: "No users found :(",
-                  )
-                ],
+    Widget friends = Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: Provider.of<General_Provider>(context, listen: false)
+            .user
+            .friendList
+            .asMap()
+            .entries
+            .map(
+              (e) => InkWell(
+                onTap: () {
+                  Alert(
+                      context: context,
+                      title: "Coming Soon",
+                      style: AlertStyle(
+                        titleStyle: H2TextStyle(color: kPrimaryAccentColor),
+                      ),
+                      content: Column(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 10,
+                          ),
+                          H3(textBody: "Stay tuned for the next update :)"),
+                          SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      ),
+                      buttons: [
+                        DialogButton(
+                          color: Colors.white,
+                          height: 0,
+                          child: SizedBox(height: 0),
+                          onPressed: () {},
+                        ),
+                      ]).show();
+                },
+                child: Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(10.0),
+                      ),
+                    ),
+                    elevation: 0,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Icon(
+                            FontAwesomeIcons.userMinus,
+                            color: kIconColor,
+                            size: iconSize,
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          H3(textBody: e.value),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          BodyText(
+                            textBody: "Tap me to request loan",
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      ),
+                    )),
               ),
-            ),
-          );
-        });
+            )
+            .toList());
     return Scaffold(
       backgroundColor: Color(0xffF9F9F9),
       appBar: AppBarPageName(
@@ -315,7 +149,7 @@ class _RequestLoanState extends State<RequestLoan> {
       body: SafeArea(
         top: true,
         child: Padding(
-          padding: EdgeInsets.only(left: 20.0, right: 20.0),
+          padding: EdgeInsets.only(left: 10.0, right: 10.0),
           child: NestedScrollView(
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) {
@@ -337,7 +171,40 @@ class _RequestLoanState extends State<RequestLoan> {
                   const EdgeInsets.symmetric(vertical: 10, horizontal: 10.0),
               child: ListView(
                 children: <Widget>[
-                  myFriends,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      H1(
+                        textBody: "My Friends",
+                        color: kPrimaryAccentColor,
+                      ),
+                      InkWell(
+                        child: Container(
+                            decoration: BoxDecoration(
+                                color: kPrimaryAccentColor,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(24))),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 10.0),
+                            child: Icon(
+                              FontAwesomeIcons.syncAlt,
+                              size: iconSize,
+                              color: kTextLightColor,
+                            )),
+                        onTap: () {
+                          setState(() async {
+                            await getUser();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  BodyText(
+                    textBody: "Reload to update friend list",
+                    color: kTextDarkColor,
+                  ),
+                  SizedBox(height: 10),
+                  friends,
                   SizedBox(height: 20),
                 ],
               ),

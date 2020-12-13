@@ -24,6 +24,7 @@ class SearchFriend extends StatefulWidget {
 }
 
 class _SearchFriendState extends State<SearchFriend> {
+  BuildContext scaffoldContext;
   String userImagePath;
   String searchQuery = "";
 
@@ -45,6 +46,18 @@ class _SearchFriendState extends State<SearchFriend> {
 
   @override
   Widget build(BuildContext context) {
+    void createSnackBar(String message) {
+      final snackBar = new SnackBar(
+          content: new BodyText(
+            textBody: message,
+            color: kTextLightColor,
+          ),
+          backgroundColor: kTextDarkColor);
+
+      // Find the Scaffold in the Widget tree and use it to show a SnackBar!
+      Scaffold.of(scaffoldContext).showSnackBar(snackBar);
+    }
+
     Widget exploreUsers = StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance
             .collection("Users")
@@ -136,9 +149,9 @@ class _SearchFriendState extends State<SearchFriend> {
                             child: Card(
                               child: InkWell(
                                 splashColor: Colors.blue.withAlpha(30),
-                                onTap: () {
+                                onTap: () async {
                                   print('Tapped on user.');
-                                  Alert(
+                                  await Alert(
                                       context: context,
                                       title: "Add " +
                                           tempObj.fullName +
@@ -221,6 +234,7 @@ class _SearchFriendState extends State<SearchFriend> {
                                           onPressed: () {},
                                         ),
                                       ]).show();
+                                  createSnackBar("User Added to friend list");
                                 },
                                 child: Container(
                                   child: GridTileUser(
@@ -263,7 +277,7 @@ class _SearchFriendState extends State<SearchFriend> {
                                         height: 5,
                                       ),
                                       BodyText(
-                                        textBody: "Tap to add friend",
+                                        textBody: "Tap me to add friend",
                                       ),
                                     ],
                                   ),
@@ -315,74 +329,77 @@ class _SearchFriendState extends State<SearchFriend> {
           );
         });
     return Scaffold(
-      backgroundColor: Color(0xffF9F9F9),
-      appBar: AppBarPageName(
-        pageName: "Search Friends",
-      ),
-      body: SafeArea(
-        top: true,
-        child: Padding(
-          padding: EdgeInsets.only(left: 20.0, right: 20.0),
-          child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [],
+        backgroundColor: Color(0xffF9F9F9),
+        appBar: AppBarPageName(
+          pageName: "Search Friends",
+        ),
+        body: new Builder(builder: (BuildContext context) {
+          scaffoldContext = context;
+          return SafeArea(
+            top: true,
+            child: Padding(
+              padding: EdgeInsets.only(left: 20.0, right: 20.0),
+              child: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ];
-            },
-            body: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 10.0),
-              child: ListView(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      H1(
-                        textBody: "Search by Email",
-                        color: kPrimaryAccentColor,
+                  ];
+                },
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10, horizontal: 10.0),
+                  child: ListView(
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          H1(
+                            textBody: "Search by Email",
+                            color: kPrimaryAccentColor,
+                          ),
+                          InkWell(
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(24))),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
+                                child: Icon(
+                                  FontAwesomeIcons.search,
+                                  size: iconSize,
+                                  color: kPrimaryAccentColor,
+                                )),
+                            onTap: () {
+                              setState(() {
+                                searchQuery =
+                                    emailTextField.retValue.toString();
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                      InkWell(
-                        child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(24))),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 8.0),
-                            child: Icon(
-                              FontAwesomeIcons.search,
-                              size: iconSize,
-                              color: kPrimaryAccentColor,
-                            )),
-                        onTap: () {
-                          setState(() {
-                            searchQuery = emailTextField.retValue.toString();
-                          });
-                        },
-                      ),
+                      SizedBox(height: 10),
+                      emailTextField,
+                      SizedBox(height: 20),
+                      exploreUsers,
+                      SizedBox(height: 20),
                     ],
                   ),
-                  SizedBox(height: 10),
-                  emailTextField,
-                  SizedBox(height: 20),
-                  exploreUsers,
-                  SizedBox(height: 20),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        }));
   }
 }
