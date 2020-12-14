@@ -28,15 +28,14 @@ class RequestLoan extends StatefulWidget {
 }
 
 class _RequestLoanState extends State<RequestLoan> {
+  BuildContext scaffoldContext;
   String userImagePath;
   List<String> friendsList;
   int lamount;
   int ltenure;
-  Set inputformat = Set();
   @override
   void initState() {
     getUser();
-    inputformat.add(FilteringTextInputFormatter.allow(RegExp('[0-9]')));
   }
 
   void getUser() async {
@@ -86,6 +85,18 @@ class _RequestLoanState extends State<RequestLoan> {
 
   @override
   Widget build(BuildContext context) {
+    void createSnackBar(String message) {
+      final snackBar = new SnackBar(
+          content: new BodyText(
+            textBody: message,
+            color: kTextLightColor,
+          ),
+          backgroundColor: kTextDarkColor);
+
+      // Find the Scaffold in the Widget tree and use it to show a SnackBar!
+      Scaffold.of(scaffoldContext).showSnackBar(snackBar);
+    }
+
     Widget friends = Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -145,24 +156,20 @@ class _RequestLoanState extends State<RequestLoan> {
                               ButtonLoading(
                                 labelText: "Confirm",
                                 onTap: () async {
-//                                  Provider.of<General_Provider>(context,
-//                                          listen: false)
-//                                      .user
-//                                      .friendList
-//                                      .add(tempObj.email);
                                   LoanModel loanObj = LoanModel(
-                                    loanFrom: Provider.of<General_Provider>(
+                                    loanFrom: e.value,
+                                    loanTo: Provider.of<General_Provider>(
                                             context,
                                             listen: false)
                                         .user
                                         .email,
-                                    loanTo: e.value,
                                     status: "Unpaid",
                                     amount: lamount,
                                     tenure: ltenure,
                                     date: DateFormat("dd/MM/yyyy")
                                         .format(DateTime.now())
                                         .toString(),
+                                    approvalStatus: "Unapproved",
                                   );
                                   loanObj.print_loan();
                                   addLoanToDb(loanObj)
@@ -184,6 +191,7 @@ class _RequestLoanState extends State<RequestLoan> {
                           onPressed: () {},
                         ),
                       ]).show();
+                  createSnackBar("Loan requested");
                 },
                 child: Card(
                     color: Colors.white,
@@ -232,78 +240,80 @@ class _RequestLoanState extends State<RequestLoan> {
             )
             .toList());
     return Scaffold(
-      backgroundColor: Color(0xffF9F9F9),
-      appBar: AppBarPageName(
-        pageName: "Request Loan",
-        helpAlertTitle: "Request Loan Help",
-        helpAlertBody: "Tap to request a loan from list of friends.",
-      ),
-      body: SafeArea(
-        top: true,
-        child: Padding(
-          padding: EdgeInsets.only(left: 10.0, right: 10.0),
-          child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [],
+        backgroundColor: Color(0xffF9F9F9),
+        appBar: AppBarPageName(
+          pageName: "Request Loan",
+          helpAlertTitle: "Request Loan Help",
+          helpAlertBody: "Tap to request a loan from list of friends.",
+        ),
+        body: Builder(builder: (BuildContext context) {
+          scaffoldContext = context;
+          return SafeArea(
+            top: true,
+            child: Padding(
+              padding: EdgeInsets.only(left: 10.0, right: 10.0),
+              child: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ];
-            },
-            body: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 10.0),
-              child: ListView(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      H1(
-                        textBody: "My Friends",
-                        color: kPrimaryAccentColor,
+                  ];
+                },
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10, horizontal: 10.0),
+                  child: ListView(
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          H1(
+                            textBody: "My Friends",
+                            color: kPrimaryAccentColor,
+                          ),
+                          InkWell(
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    color: kPrimaryAccentColor,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(24))),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 10.0),
+                                child: Icon(
+                                  FontAwesomeIcons.syncAlt,
+                                  size: iconSize,
+                                  color: kTextLightColor,
+                                )),
+                            onTap: () {
+                              setState(() {
+                                getUser();
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                      InkWell(
-                        child: Container(
-                            decoration: BoxDecoration(
-                                color: kPrimaryAccentColor,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(24))),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 10.0),
-                            child: Icon(
-                              FontAwesomeIcons.syncAlt,
-                              size: iconSize,
-                              color: kTextLightColor,
-                            )),
-                        onTap: () {
-                          setState(() {
-                            getUser();
-                          });
-                        },
+                      BodyText(
+                        textBody: "Reload to update friend list",
+                        color: kTextDarkColor,
                       ),
+                      SizedBox(height: 10),
+                      friends,
+                      SizedBox(height: 20),
                     ],
                   ),
-                  BodyText(
-                    textBody: "Reload to update friend list",
-                    color: kTextDarkColor,
-                  ),
-                  SizedBox(height: 10),
-                  friends,
-                  SizedBox(height: 20),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        }));
   }
 }

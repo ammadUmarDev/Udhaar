@@ -46,6 +46,17 @@ class UserModel {
     print(this.fullName);
     print(this.email);
     print(this.createdDate);
-    print(this.lastPassChangeDate);
+    print(this.friendList);
+    print(this.friendsLended);
+    print(this.friendsOwed);
+    print(this.pendingLoanApprovalsRequests);
+    print(this.pendingLoanApprovalsRequestsCount);
+    print(this.pendingPaybackConfirmations);
+    print(this.pendingPaybackConfirmationsCount);
+    print(this.totalAmountLended);
+    print(this.totalAmountOwed);
+    print(this.totalFriendsLended);
+    print(this.totalFriendsOwed);
+    print(this.totalRequests);
   }
 }

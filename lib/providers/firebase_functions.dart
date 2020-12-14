@@ -84,12 +84,12 @@ Future<UserModel> getUserDocFirebase(String userId) async {
         lastPassChangeDate:
             documentSnapshot.data()["Last_Pass_Change_Date"].toString(),
         friendList: documentSnapshot.data()["Friend_List"].split(","),
-        friendsLended: documentSnapshot.data()["Friends_Lended"],
-        friendsOwed: documentSnapshot.data()["Friends_Owed"],
-        pendingLoanApprovalsRequests:
-            documentSnapshot.data()["Pending_Loan_Approvals_Requests"],
+        friendsLended: List.from(documentSnapshot.data()["Friends_Lended"]),
+        friendsOwed: List.from(documentSnapshot.data()["Friends_Owed"]),
+        pendingLoanApprovalsRequests: List.from(
+            documentSnapshot.data()["Pending_Loan_Approvals_Requests"]),
         pendingPaybackConfirmations:
-            documentSnapshot.data()["Pending_Payback_Confirmations"],
+            List.from(documentSnapshot.data()["Pending_Payback_Confirmations"]),
         pendingLoanApprovalsRequestsCount:
             documentSnapshot.data()["Pending_Loan_Approvals_Requests_Count"],
         pendingPaybackConfirmationsCount:
@@ -160,6 +160,7 @@ Future<bool> addLoanToDb(LoanModel loanObj) async {
       'Amount': loanObj.amount,
       'Tenure': loanObj.tenure,
       'Date': loanObj.date,
+      'Approval_Status': loanObj.approvalStatus,
       //    new DateFormat("dd/MM/yyyy").parse("11/11/2011");
     });
   }

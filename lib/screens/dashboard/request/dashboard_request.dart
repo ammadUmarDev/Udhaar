@@ -525,7 +525,7 @@ class _DashboardRequestState extends State<DashboardRequest> {
                                 'Pending Loan\nApproval Requests',
                                 FontAwesomeIcons.stopwatch,
                                 FontAwesomeIcons.arrowUp,
-                                '1',
+                                ".",
                                 kIconColor),
                           ),
                           Padding(
@@ -538,7 +538,7 @@ class _DashboardRequestState extends State<DashboardRequest> {
                                 'Pending Paidback Confirmations',
                                 FontAwesomeIcons.stopwatch,
                                 FontAwesomeIcons.check,
-                                '0',
+                                ".",
                                 kIconColor),
                           ),
                         ],

@@ -31,7 +31,36 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool active = false;
   bool authCheckFields = false;
-
+  TextFieldOutlined emailTextField = TextFieldOutlined(
+    textFieldText: 'Email (example@gmail.com)',
+    textFieldIcon: Icon(
+      FontAwesomeIcons.solidEnvelopeOpen,
+      size: iconSize,
+      color: kIconColor,
+    ),
+    keyboardType: TextInputType.emailAddress,
+    isValidEntry: (entry) {
+      if (entry.toString().contains('@') && entry.toString().endsWith('.com'))
+        return '';
+      return 'Invalid Email';
+    },
+    onChanged: () {},
+  );
+  TextFieldOutlined passwordTextField = TextFieldOutlined(
+    textFieldText: 'Password',
+    textFieldIcon: Icon(
+      FontAwesomeIcons.lock,
+      size: iconSize,
+      color: kIconColor,
+    ),
+    obscure: true,
+    keyboardType: TextInputType.visiblePassword,
+    isValidEntry: (entry) {
+      if (entry.toString().length <= 6)
+        return 'Min Password Length: 6 characters';
+      return '';
+    },
+  );
   @override
   Widget build(BuildContext context) {
     Widget welcomeBack = Text(
@@ -54,36 +83,6 @@ class _LoginPageState extends State<LoginPage> {
           textBody: 'Login to your account using\nEmail',
           color: kTextLightColor,
         ));
-    TextFieldOutlined emailTextField = TextFieldOutlined(
-      textFieldText: 'Email (example@gmail.com)',
-      textFieldIcon: Icon(
-        FontAwesomeIcons.solidEnvelopeOpen,
-        size: iconSize,
-        color: kIconColor,
-      ),
-      keyboardType: TextInputType.emailAddress,
-      isValidEntry: (entry) {
-        if (entry.toString().contains('@') && entry.toString().endsWith('.com'))
-          return '';
-        return 'Invalid Email';
-      },
-      onChanged: () {},
-    );
-    TextFieldOutlined passwordTextField = TextFieldOutlined(
-      textFieldText: 'Password',
-      textFieldIcon: Icon(
-        FontAwesomeIcons.lock,
-        size: iconSize,
-        color: kIconColor,
-      ),
-      obscure: true,
-      keyboardType: TextInputType.visiblePassword,
-      isValidEntry: (entry) {
-        if (entry.toString().length <= 6)
-          return 'Min Password Length: 6 characters';
-        return '';
-      },
-    );
 
     Widget loginButton = ButtonErims(
       onTap: (startLoading, stopLoading, btnState) async {
@@ -215,7 +214,6 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
       body: CustomPaint(
         painter: AuthBackground(),
@@ -227,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Spacer(flex: 3),
+                    Spacer(flex: 1),
                     welcomeBack,
                     subTitle,
                     Spacer(flex: 1),

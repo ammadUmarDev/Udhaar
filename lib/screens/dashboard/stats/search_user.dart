@@ -234,7 +234,7 @@ class _SearchFriendState extends State<SearchFriend> {
                                           onPressed: () {},
                                         ),
                                       ]).show();
-                                  createSnackBar("User Added to friend list");
+                                  createSnackBar("User added to friend list");
                                 },
                                 child: Container(
                                   child: GridTileUser(
@@ -333,7 +333,7 @@ class _SearchFriendState extends State<SearchFriend> {
         appBar: AppBarPageName(
           pageName: "Search Friends",
         ),
-        body: new Builder(builder: (BuildContext context) {
+        body: Builder(builder: (BuildContext context) {
           scaffoldContext = context;
           return SafeArea(
             top: true,

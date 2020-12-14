@@ -92,7 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
     Widget subTitle = Padding(
         padding: const EdgeInsets.only(right: 56.0, top: 20),
         child: H1(
-          textBody: 'Sign into your account using\nEmail',
+          textBody: 'Sign up for your an account using\nEmail',
           color: kTextLightColor,
         ));
     Widget registerButton = ButtonErims(
@@ -231,7 +231,6 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
       body: ModalProgressHUD(
         inAsyncCall: _showSpinner,

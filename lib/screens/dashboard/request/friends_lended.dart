@@ -31,13 +31,18 @@ class _FriendsLendedState extends State<FriendsLended> {
   @override
   Widget build(BuildContext context) {
     //TODO: fix query, fix remove a friend
-    Widget myFriends = StreamBuilder<QuerySnapshot>(
+    Widget friendsLended = StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance
-            .collection("Users")
-            .where("Email", isEqualTo: "sdasds")
-            .limit(2)
+            .collection("Loans")
+            .where("Loan_From",
+                isEqualTo: Provider.of<General_Provider>(context, listen: false)
+                    .user
+                    .email)
+            .where("Approval_Status", isEqualTo: "Approved")
+            .where("Status", isEqualTo: "Unpaid")
             .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        builder:
+            (BuildContext ccontext, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return Center(
                 child: Column(
@@ -82,191 +87,131 @@ class _FriendsLendedState extends State<FriendsLended> {
             case ConnectionState.active:
               print("Stream has started but not finished");
 
-              var totalUserCount = 0;
-              List<DocumentSnapshot> userDocs;
+              var totalReqCount = 0;
+              List<DocumentSnapshot> reqDocs;
 
               if (snapshot.hasData) {
-                userDocs = snapshot.data.docs;
-                totalUserCount = userDocs.length;
+                reqDocs = snapshot.data.docs;
+                totalReqCount = reqDocs.length;
+                print(totalReqCount);
 
-                if (totalUserCount > 0) {
+                if (totalReqCount > 0) {
                   return GridView.builder(
-                      itemCount: totalUserCount,
+                      itemCount: totalReqCount,
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
                       primary: false,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3),
-                      itemBuilder: (BuildContext context, int index) {
-                        if (userDocs[index].data()["Email"] !=
-                            Provider.of<General_Provider>(context,
-                                    listen: false)
-                                .user
-                                .email) {
-                          UserModel tempObj = UserModel(
-                            email: userDocs[index].data()["Email"].toString(),
-                            fullName:
-                                userDocs[index].data()["Full_Name"].toString(),
-                            userID:
-                                userDocs[index].data()["User_Id"].toString(),
-                            createdDate: userDocs[index]
-                                .data()["Created_Date"]
-                                .toString(),
-                            lastPassChangeDate: userDocs[index]
-                                .data()["Last_Pass_Change_Date"]
-                                .toString(),
-                            friendList: userDocs[index]
-                                .data()["Friend_List"]
-                                .split(","),
-                          );
-                          return Center(
-                            child: Card(
-                              child: InkWell(
-                                splashColor: Colors.blue.withAlpha(30),
-                                onTap: () {
-                                  print('Tapped on user.');
-                                  Alert(
-                                      context: context,
-                                      title: "Request a Loan From " +
-                                          tempObj.fullName,
-                                      style: AlertStyle(
-                                        titleStyle: H2TextStyle(
+                          crossAxisCount: 1, mainAxisSpacing: 1),
+                      itemBuilder: (BuildContext ccontext, int index) {
+                        return Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: kTextLightColor,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10.0, horizontal: 10),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          FontAwesomeIcons.handHoldingUsd,
+                                          color: kIconColor,
+                                        ),
+                                        SizedBox(width: 20),
+                                        H3(textBody: "Money lended to"),
+                                        SizedBox(width: 10),
+                                        H2(
+                                            textBody: reqDocs[index]
+                                                .data()["Loan_To"]
+                                                .toString()
+                                                .substring(
+                                                    0,
+                                                    reqDocs[index]
+                                                        .data()["Loan_To"]
+                                                        .toString()
+                                                        .indexOf("@")),
                                             color: kPrimaryAccentColor),
-                                      ),
-                                      content: Column(
-                                        children: <Widget>[
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          RoundedInputField(
-                                            hintText: "Amount:",
-                                            icon: FontAwesomeIcons.piggyBank,
-                                          ),
-                                          RoundedInputField(
-                                            hintText: "Tenure:",
-                                            icon: FontAwesomeIcons.businessTime,
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+//                                          decoration: BoxDecoration(
+//                                            border: Border(
+//                                                color: kPrimaryAccentColor
+//                                                    .withOpacity(0.2),
+//                                                width: 2),
+//                                            color: kTextLightColor),
+                                    width: double.infinity,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Column(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              RoundedButton(
-                                                text: "Cancel",
-                                                textColor: kTextDarkColor,
-                                                press: () {
-                                                  Navigator.pop(context);
-                                                },
-                                              ),
-                                              ButtonLoading(
-                                                labelText: "Confirm",
-                                                onTap: () async {
-                                                  Provider.of<General_Provider>(
-                                                          context,
-                                                          listen: false)
-                                                      .user
-                                                      .friendList
-                                                      .add(tempObj.email);
-                                                  FirebaseFirestore db =
-                                                      FirebaseFirestore
-                                                          .instance;
-                                                  CollectionReference users =
-                                                      db.collection('Users');
-                                                  bool checkUpdateFriendList =
-                                                      false;
-                                                  await users
-                                                      .doc(Provider.of<
-                                                                  General_Provider>(
-                                                              context,
-                                                              listen: false)
-                                                          .firebaseUser
-                                                          .uid)
-                                                      .update({
-                                                        'Friend_List': Provider
-                                                                .of<General_Provider>(
-                                                                    context,
-                                                                    listen:
-                                                                        false)
-                                                            .user
-                                                            .friendList
-                                                            .join(",")
-                                                      })
-                                                      .then((value) =>
-                                                          checkUpdateFriendList =
-                                                              true)
-                                                      .catchError((error) => print(
-                                                          "Failed to update user: $error"));
-                                                  if (checkUpdateFriendList ==
-                                                      true) {
-                                                    print(
-                                                        "User added to friendlist");
-                                                    Navigator.pop(context);
-                                                  }
-                                                },
-                                              ),
+                                              BodyText(
+                                                  textBody: "•  Amount: PKR " +
+                                                      reqDocs[index]
+                                                          .data()["Amount"]
+                                                          .toString(),
+                                                  color: kTextDarkColor),
+                                              SizedBox(height: 5),
+                                              BodyText(
+                                                  textBody: "•  Tenure: " +
+                                                      reqDocs[index]
+                                                          .data()["Tenure"]
+                                                          .toString() +
+                                                      " months",
+                                                  color: kTextDarkColor),
+                                              SizedBox(height: 5),
+                                              BodyText(
+                                                  textBody: "•  Approval Status: " +
+                                                      reqDocs[index]
+                                                          .data()[
+                                                              "Approval_Status"]
+                                                          .toString(),
+                                                  color: kTextDarkColor),
+                                              SizedBox(height: 5),
+                                              BodyText(
+                                                  textBody:
+                                                      "•  Payback Status: " +
+                                                          reqDocs[index]
+                                                              .data()["Status"],
+                                                  color: kTextDarkColor),
+                                              SizedBox(height: 5),
+                                              BodyText(
+                                                  textBody:
+                                                      "•  Requested Date: " +
+                                                          reqDocs[index]
+                                                              .data()["Date"]
+                                                              .toString(),
+                                                  color: kTextDarkColor),
+                                              SizedBox(height: 10),
                                             ],
                                           ),
                                         ],
                                       ),
-                                      buttons: [
-                                        DialogButton(
-                                          color: Colors.white,
-                                          height: 0,
-                                          child: SizedBox(height: 0),
-                                          onPressed: () {},
-                                        ),
-                                      ]).show();
-                                },
-                                child: Container(
-                                  child: GridTileUser(
-                                    userObj: tempObj,
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
-                          );
-                        } else {
-                          return InkWell(
-                            onTap: () async {},
-                            child: Card(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(10.0),
-                                  ),
-                                ),
-                                elevation: 0,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Icon(
-                                        FontAwesomeIcons.userPlus,
-                                        color: kIconColor,
-                                        size: iconSize,
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      H3(textBody: "Display Name"),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      BodyText(
-                                        textBody: "Tap to add friend",
-                                      ),
-                                    ],
-                                  ),
-                                )),
-                          );
-                        }
+                          ],
+                        );
                       });
                 }
               }
@@ -277,7 +222,7 @@ class _FriendsLendedState extends State<FriendsLended> {
                     padding: const EdgeInsets.only(top: 50.0),
                   ),
                   H3(
-                    textBody: "Lend money to friends and check again :)",
+                    textBody: "No requests found :(",
                   )
                 ],
               ));
@@ -290,7 +235,7 @@ class _FriendsLendedState extends State<FriendsLended> {
                     padding: const EdgeInsets.only(top: 50.0),
                   ),
                   H3(
-                    textBody: "All users fetched.",
+                    textBody: "All requests fetched.",
                   )
                 ],
               ));
@@ -304,7 +249,7 @@ class _FriendsLendedState extends State<FriendsLended> {
                     padding: const EdgeInsets.only(top: 50.0),
                   ),
                   H3(
-                    textBody: "No users found :(",
+                    textBody: "No requests found :(",
                   )
                 ],
               ),
@@ -321,7 +266,7 @@ class _FriendsLendedState extends State<FriendsLended> {
       body: SafeArea(
         top: true,
         child: Padding(
-          padding: EdgeInsets.only(left: 20.0, right: 20.0),
+          padding: EdgeInsets.only(left: 10.0, right: 10.0),
           child: NestedScrollView(
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) {
@@ -338,73 +283,14 @@ class _FriendsLendedState extends State<FriendsLended> {
                 ),
               ];
             },
-            body: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 10.0),
-              child: ListView(
-                children: <Widget>[
-                  Padding(
+            body: ListView(
+              children: <Widget>[
+                Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 10.0),
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: kPrimaryAccentColor,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 15.0),
-                                  child: H3(
-                                      textBody: "Ammad Umar",
-                                      color: kTextLightColor),
-                                ),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: kPrimaryAccentColor, width: 3),
-                                    color: kTextLightColor),
-                                width: double.infinity,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      H3(
-                                          textBody: "Amount: PKR 5000",
-                                          color: kTextDarkColor),
-                                      SizedBox(height: 10),
-                                      H3(
-                                          textBody: "Tenure: 5 months",
-                                          color: kTextDarkColor),
-                                      SizedBox(height: 10),
-                                      H3(
-                                          textBody:
-                                              "Loan approved at : 9:00 PM - November 20, 2020",
-                                          color: kTextDarkColor),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                ],
-              ),
+                    child: friendsLended),
+                SizedBox(height: 20),
+              ],
             ),
           ),
         ),

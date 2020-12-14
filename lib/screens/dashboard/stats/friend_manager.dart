@@ -28,11 +28,11 @@ class _FriendManagerState extends State<FriendManager> {
   String userImagePath;
   List<String> friendsList;
   @override
-  Future<void> initState() {
+  void initState() {
     getUser();
   }
 
-  Future<void> getUser() async {
+  void getUser() async {
     return await FirebaseFirestore.instance
         .collection('Users')
         .doc(Provider.of<General_Provider>(context, listen: false)
@@ -50,6 +50,21 @@ class _FriendManagerState extends State<FriendManager> {
           lastPassChangeDate:
               documentSnapshot.data()["Last_Pass_Change_Date"].toString(),
           friendList: documentSnapshot.data()["Friend_List"].split(","),
+          friendsOwed: List.from(documentSnapshot.data()["Friends_Owed"]),
+          pendingLoanApprovalsRequests: List.from(
+              documentSnapshot.data()["Pending_Loan_Approvals_Requests"]),
+          pendingPaybackConfirmations: List.from(
+              documentSnapshot.data()["Pending_Payback_Confirmations"]),
+          pendingLoanApprovalsRequestsCount:
+              documentSnapshot.data()["Pending_Loan_Approvals_Requests_Count"],
+          pendingPaybackConfirmationsCount:
+              documentSnapshot.data()["Pending_Payback_Confirmations_Count"],
+          totalAmountLended: documentSnapshot.data()["Total_Amount_Lended"],
+          totalAmountOwed: documentSnapshot.data()["Total_Amount_Owed"],
+          totalFriendsLended: documentSnapshot.data()["Total_Friends_Lended"],
+          totalFriendsOwed: documentSnapshot.data()["Total_Friends_Owed"],
+          totalFriends: documentSnapshot.data()["Total_Friends"],
+          totalRequests: documentSnapshot.data()["Total_Requests"],
         );
         setState(() {
           Provider.of<General_Provider>(context, listen: false)
